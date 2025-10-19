@@ -1,7 +1,6 @@
 from typing import Any
 
 import requests
-
 from src.data_requesters.helper import retry_on_error
 
 
@@ -12,9 +11,10 @@ class Ademe_API_requester:
 
     # Class attributes: base URLs for different datasets
     __base_url_existant = (
-        "https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant/lines"
+        "https://data.ademe.fr/data-fair/api/v1/datasets/dpe03existant"
     )
-    __base_url_neuf = "https://data.ademe.fr/data-fair/api/v1/datasets/dpe02neuf/lines"
+
+    __base_url_neuf = "https://data.ademe.fr/data-fair/api/v1/datasets/dpe02neuf"
 
     def __init__(
         self,
@@ -24,10 +24,8 @@ class Ademe_API_requester:
 
         Args:
             size (int, optional): The number of results to return per page. Defaults to 2500.
-            max_retries (int, optional): The maximum number of retry attempts for API requests. Defaults to 3.
-            backoff_factor (int, optional): The backoff factor for retry delays. Defaults to 2.
         """
-        self.__params: dict[str, int] = {"size": size}
+        self.__size: int = size
 
     @retry_on_error(max_retries=3, backoff_factor=2)
     def __get_data(self, url: str, params: dict[str, Any] | None = None) -> dict | None:
@@ -73,13 +71,14 @@ class Ademe_API_requester:
         )
 
         # Build the parameter dictionary from the new department argument.
-        params = self.__params | {"qs": f"code_departement_ban:{departement}"}
+        params = {"size": self.__size} | {"qs": f"code_departement_ban:{departement}"}
 
         # Initialize the all_data list to get all the data from the pagination loop.
         all_data: list[dict[str, Any]] = []
 
         # Initialize the URL to the base URL depending of if we want new or existing buildings.
         url = self.__base_url_existant if not neuf else self.__base_url_neuf
+        url += "/lines"  # Endpoint for lines data.
 
         total_length = self.__get_length(url, params=params)
 
@@ -102,6 +101,25 @@ class Ademe_API_requester:
 
         return all_data
 
+    def get_all_departments_count(self, neuf: bool = False) -> list:
+        """Fetch the aggregated count of all departments.
+
+        Args:
+            neuf (bool, optional): Whether to request for new houses. Defaults to False.
+
+        Returns:
+            int: The total count of houses.
+        """
+        # Initialize the URL to the base URL depending of if we want new or existing buildings.
+        url = self.__base_url_existant if not neuf else self.__base_url_neuf
+        url += "/values_agg"  # Endpoint for values aggregation.
+
+        data = self.__get_data(
+            url, params={"agg_size": 400, "field": "code_departement_ban"}
+        )
+
+        return data.get("aggs", []) if data else []
+
     def get_all_data(self, neuf: bool = False) -> list[dict[str, Any]]:
         """Fetch the complete database of existing or new buildings.
 
@@ -121,9 +139,10 @@ class Ademe_API_requester:
 
         # Initialize the URL to the base URL depending of if we want new or existing buildings.
         url = self.__base_url_existant if not neuf else self.__base_url_neuf
+        url += "/lines"  # Endpoint for lines data.
 
-        # Local copy of the default parameters (default size of fetched pages).
-        params = self.__params.copy()
+        # Default size parameter.
+        params = {"size": self.__size}
 
         total_length = self.__get_length(url, params=params)
 

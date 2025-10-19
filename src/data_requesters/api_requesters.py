@@ -53,6 +53,56 @@ class Ademe_API_requester:
         length = data.get("total", 0) if data else 0
         return length
 
+    def custom_lines_request(
+        self, neuf: bool = False, limit: int | None = None, **kwargs
+    ) -> list[dict[str, Any]]:
+        """Make a custom request to the lines endpoint with additional parameters, while handling the looping requests for pagination.
+
+        Args:
+            neuf (bool, optional): Whether to request for new houses. Defaults to False.
+            limit (int | None, optional): The number of results we want to limit the request to. Defaults to None.
+            **kwargs: Additional parameters to include in the request.
+
+        Returns:
+            dict: The response from the API.
+        """
+        # Initialize the URL to the base URL depending of if we want new or existing buildings.
+        url = self.__base_url_existant if not neuf else self.__base_url_neuf
+        url += "/lines"  # Endpoint for lines data.
+
+        # Setting the parameters for the request.
+        params = {"size": self.__size} | kwargs
+
+        # Initialize the all_data list to get all the data from the pagination loop.
+        all_data: list[dict[str, Any]] = []
+
+        total_length = self.__get_length(url, params=params)
+        if limit is not None and limit < total_length:
+            total_length = limit
+
+        if total_length == 0:
+            print("No data found for the specified department.")
+            return all_data
+
+        print(f"Total records to fetch: {total_length}")
+
+        # Pagination loop.
+        while url:
+            # Break the loop if we reached the limit.
+            if limit is not None and len(all_data) >= limit:
+                break
+
+            data = self.__get_data(url, params=params)
+            all_data.extend(data["results"])
+            print(
+                f"Fetched {len(data['results'])} records. Total so far: {len(all_data)}/{total_length} ({round(len(all_data) / total_length * 100, 2)}%)"
+            )
+            url = data.get("next")  # Get the next page URL.
+            params = None  # Clear params for subsequent requests.
+        # endwhile
+
+        return all_data
+
     def get_bydepartement(
         self, departement: int, neuf: bool = False
     ) -> list[dict[str, Any]]:

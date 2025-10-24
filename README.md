@@ -63,3 +63,6 @@ mon_projet/
 ├── data/                      # data storage (will contains a sample for test).
 └── notebooks/                 # ipython noteboks for exploration.                     
 ```
+
+## Links
+- [📊 Data exploration and models building](https://github.com/4xel-C/SISE_Enedis_ML_Study): Data exploration have been separated in another repository to avoid overloading main application from model preparations and explorations.

@@ -51,7 +51,9 @@ mon_projet/
 │
 ├── src/                                            # Main code.
 │   ├── data_requesters                             # Requesters for data on external APIs.
-│   │   ├── api_requesters.py
+│   │   ├── Ademe.py                                
+│   │   ├── Elevation.py                            
+│   │   ├── Enedis.py
 │   │   └── helper.py
 │   └── api.py/                                     # FastAPI routes for the application.
 │       └── main.py                                 # main FastAPI file to run the back-end API routes.

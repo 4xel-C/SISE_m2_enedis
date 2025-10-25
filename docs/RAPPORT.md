@@ -73,7 +73,7 @@ Les données ont été scrupuleusement vérifiées, homogénéisés et transform
 
 ### Répartition des classes DPE
 La répartition des classes DPEs après extraction est restée quasiment inchangée lors du traitement:
-![[Pasted image 20251025223717.png]]
+<img width="553" height="425" alt="image" src="https://github.com/user-attachments/assets/44ad48dc-b23f-4783-9514-91de2423dd9c" />
 
 ---
 ## Modèle de classification
@@ -106,7 +106,9 @@ Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons t
 - $t_{\alpha/2}$​ → quantile de la loi de Student pour le niveau de confiance choisi
 - $CI$ → intervalle de confiance
 
-![[Pasted image 20251025231646.png]]
+<img width="778" height="466" alt="image" src="https://github.com/user-attachments/assets/eb26b4bb-78eb-4403-8a02-21de4822a6be" />
+
+
 
 | **Modèle**                 | **Métrique**      | **Moyenne (mean)** | **Écart-type (std)** | **IC95%**      |
 | -------------------------- | ----------------- | ------------------ | -------------------- | -------------- |
@@ -138,12 +140,13 @@ Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons t
 
 ### XGBoost: évaluation finale
 Les opérations effectuées ci-dessus nous permettent de conclure notre choix pour l'**XGBoost**. Afin d'estimer la véritable efficacité de notre algorithme. Nous effectuons un dernier split des données pour un entraînement et un test. Nous pouvons ainsi générer la **matrice de confusion** suivante qui complémente les précédentes mesures:
-![[Pasted image 20251025232521.png]]
+<img width="798" height="621" alt="image" src="https://github.com/user-attachments/assets/e9ce3ae5-ab99-4559-b62e-afd7071b037f" />
 	- Nous pouvons remarquer que l'algorithme arrive à prédire raisonnablement bien une grande partie des classes. Nous pouvons aussi noter que le modèle à appris de la **hiérarchisation des classes**: lorsque la prédiction est mauvaise, le modèle parvient tout de même à **prédire une classe proche** avec une tendance à modérer ses prédictions pour les classes centrales (C et D).
 
 ### Importance des variables
 La librairie **XGBoost** permettant de monter le modèle offre le moyen de récupérer l'importance des variables dans la determination des classes. Cette "importance" est déterminé selon deux critères:
 - Le nombre de fois où la variable à été **utilisée pour séparer un nœud de l'arbre**.
-- L'imoportance du **Gain** engendré par la séparation de la variable (réduction de l'enthropie ou de l'impureté de Gini)
-![[Pasted image 20251025233722.png]]
+- L'importance du **Gain** engendré par la séparation de la variable (réduction de l'enthropie ou de l'impureté de Gini)
+<img width="1263" height="673" alt="image" src="https://github.com/user-attachments/assets/b4ed71e7-dc35-407c-a48e-5e6aecb2219f" />
+
 Ainsi notre modèle se base principalement sur **l'âge du bâtiment**, **le type d'énergie principale pour le chauffage**, et le **type du bâtiment**.

@@ -31,23 +31,37 @@ pip install -r requirements.txt
 3. **Lancer l'application**:
 
 <u>TODO</u>
+pour l'instant il faut écrire cette commande dans un terminal python
 
+- *Avec le gestionnaire de package UV :*
+```sh
+uv run streamlit run Accueil.py
+```
+
+- *Sans UV :*
+```sh
+streamlit run Accueil.py
+```
 
 ## Project structure
 ```
 mon_projet/
 │
-├── app.py                                          # Main streamlit app launcher.
+├── Accueil.py                                          # Main streamlit app launcher.
 ├── requirements.txt
 ├── README.md
 ├── pyproject.toml
 ├── uv.lock
 ├── .python-version
 │
+├── .streamlit
+│   ├── secrets.toml # Fichier contenant votre clé API publique MapBox : MAPBOX_API_KEY= "..."
+│                    # Utilisé pour des arrières plan de carte
+│
 ├── pages/                                          # Pages from streamlit.
-│   ├── 1_Visualisation.py
-│   ├── 2_Modele_ML.py
-│   └── 3_Analyse_API.py
+│   ├── 01_Stats_Dataset.py
+│   ├── 02_Carte_DPE.py
+│   └── 03_Prévision_DPE.py
 │
 ├── src/                                            # Main code.
 │   ├── data_requesters                             # Requesters for data on external APIs.

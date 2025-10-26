@@ -16,7 +16,8 @@ st.markdown("""
 Bienvenue sur l’application **DPE Ademe**, un outil interactif pour :
 - Explorer les **données énergétiques des logements** (ADEME, Enedis),
 - Visualiser les **cartes dynamiques** par zone géographique,
-- Et **prédire la classe DPE** d’un logement grâce à vos modèles de Machine Learning.
+- **Prédire la classe DPE** d’un logement grâce à vos modèles de Machine Learning.
+- Requêter des données depuis l’**API ADEME** pour enrichir votre analyse.
 
 Sélectionnez une page ci-dessous pour commencer :
 """)
@@ -29,28 +30,19 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     st.page_link(
-        "pages/01_Stats_Dataset.py",
-        label="Statistiques d'un Dataset",
+        "pages/01_Carte_Stats_Dataset.py",
+        label="Explorer la carte et les stats DPE",
         icon="📊"
     )
     st.markdown("""
-    Explorez rapidement les caractéristiques principales de votre dataset : distributions, valeurs manquantes et statistiques descriptives pour mieux comprendre vos données.
-    """)
-    
-with col2:
-    st.page_link(
-        "pages/02_Carte_DPE.py",
-        label="Explorer la carte DPE",
-        icon="🗺️"
-    )
-    st.markdown("""
     Visualisez jusqu’à plusieurs centaines de milliers de logements sur une **carte interactive**.
-    Filtrez par région, département ou classe énergétique.
+    Filtrez par région, département ou classe énergétique.\n
+    Et explorez rapidement les caractéristiques principales de votre dataset : distributions, valeurs manquantes et statistiques descriptives pour mieux comprendre vos données.
     """)
 
-with col3:
+with col2:
     st.page_link(
-        "pages/03_Prévision_DPE.py",
+        "pages/02_Prévision_DPE.py",
         label="Prédire la classe DPE",
         icon="🔮"
     )
@@ -59,6 +51,15 @@ with col3:
     à partir des caractéristiques du logement.
     """)
 
+with col3:
+    st.page_link(
+        "pages/03_Requetes_API.py",
+        label="Requêtes vers l’API ADEME",
+        icon="🌐"
+    )
+    st.markdown("""
+    Récupérez des données depuis **l’API ADEME (DPE)**.
+    """)
     
 st.divider()
 

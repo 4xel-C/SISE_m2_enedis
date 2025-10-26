@@ -99,12 +99,15 @@ Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons t
 - Re-générer le split Train/Test.
 - Entraîner le modèle et effectuer l'évaluation sur les données d'entraînement. (**balanced_accuracy, accuracy, f1_score, hamming_loss**)
 - **30** Récupérations des métriques de test: meilleure évaluation en prenant la moyenne.
-- Estimation de la stabilité en calculant les intervalles de confiances à l'aide d'un **test de Student** à 95%. $$CI = \left( \bar{x} - t_{\alpha/2} \cdot \frac{s}{\sqrt{n}},\; \bar{x} + t_{\alpha/2} \cdot \frac{s}{\sqrt{n}} \right)$$
-- $\bar{x}$ → moyenne de l’échantillon
-- $s$ → écart-type
-- $n$ → taille de l’échantillon (30)
-- $t_{\alpha/2}$​ → quantile de la loi de Student pour le niveau de confiance choisi
-- $CI$ → intervalle de confiance
+- Estimation de la stabilité en calculant les intervalles de confiances à l'aide d'un **test de Student** à 95%.
+  
+$$CI = \left( \bar{x} - t_{\alpha/2} \cdot \frac{s}{\sqrt{n}},\; \bar{x} + t_{\alpha/2} \cdot \frac{s}{\sqrt{n}} \right)$$
+
+>- $\bar{x}$ → moyenne de l’échantillon
+>- $s$ → écart-type
+>- $n$ → taille de l’échantillon (30)
+>- $t_{\alpha/2}$​ → quantile de la loi de Student pour le niveau de confiance choisi
+>- $CI$ → intervalle de confiance
 
 <img width="778" height="466" alt="image" src="https://github.com/user-attachments/assets/eb26b4bb-78eb-4403-8a02-21de4822a6be" />
 
@@ -140,8 +143,12 @@ Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons t
 
 ### XGBoost: évaluation finale
 Les opérations effectuées ci-dessus nous permettent de conclure notre choix pour l'**XGBoost**. Afin d'estimer la véritable efficacité de notre algorithme. Nous effectuons un dernier split des données pour un entraînement et un test. Nous pouvons ainsi générer la **matrice de confusion** suivante qui complémente les précédentes mesures:
+
 <img width="798" height="621" alt="image" src="https://github.com/user-attachments/assets/e9ce3ae5-ab99-4559-b62e-afd7071b037f" />
-	- Nous pouvons remarquer que l'algorithme arrive à prédire raisonnablement bien une grande partie des classes. Nous pouvons aussi noter que le modèle à appris de la **hiérarchisation des classes**: lorsque la prédiction est mauvaise, le modèle parvient tout de même à **prédire une classe proche** avec une tendance à modérer ses prédictions pour les classes centrales (C et D).
+
+
+- Nous pouvons remarquer que l'algorithme arrive à prédire raisonnablement bien une grande partie des classes. Nous pouvons aussi noter que le modèle à appris de la **hiérarchisation des classes**: lorsque la prédiction est mauvaise, le modèle parvient tout de même à **prédire une classe proche** avec une tendance à modérer ses prédictions pour les classes centrales (C et D).
+
 
 ### Importance des variables
 La librairie **XGBoost** permettant de monter le modèle offre le moyen de récupérer l'importance des variables dans la determination des classes. Cette "importance" est déterminé selon deux critères:

@@ -54,14 +54,14 @@ mon_projet/
 ├── uv.lock
 ├── .python-version
 │
-├── .streamlit
-│   ├── secrets.toml # Fichier contenant votre clé API publique MapBox : MAPBOX_API_KEY= "..."
+├── .streamlit       # À créer
+│   └── secrets.toml # Fichier contenant votre clé API publique MapBox : MAPBOX_API_KEY= "..."
 │                    # Utilisé pour des arrières plan de carte
 │
 ├── pages/                                          # Pages from streamlit.
-│   ├── 01_Stats_Dataset.py
-│   ├── 02_Carte_DPE.py
-│   └── 03_Prévision_DPE.py
+│   ├── 01_Carte_Stats_Dataset.py
+│   ├── 02_Prévision_DPE.py
+│   └── 03_Requetes_API.py
 │
 ├── src/                                            # Main code.
 │   ├── data_requesters                             # Requesters for data on external APIs.

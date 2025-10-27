@@ -35,19 +35,19 @@ pour l'instant il faut écrire cette commande dans un terminal python
 
 - *Avec le gestionnaire de package UV :*
 ```sh
-uv run streamlit run Accueil.py
+uv run streamlit run home.py
 ```
 
 - *Sans UV :*
 ```sh
-streamlit run Accueil.py
+streamlit run home.py
 ```
 
 ## Project structure
 ```
 mon_projet/
 │
-├── Accueil.py                                          # Main streamlit app launcher.
+├── home.py                                          # Main streamlit app launcher.
 ├── requirements.txt
 ├── README.md
 ├── pyproject.toml
@@ -59,9 +59,9 @@ mon_projet/
 │                    # Utilisé pour des arrières plan de carte
 │
 ├── pages/                                          # Pages from streamlit.
-│   ├── 01_Carte_Stats_Dataset.py
-│   ├── 02_Prévision_DPE.py
-│   └── 03_Requetes_API.py
+│   ├── 01_data.py
+│   ├── 02_prediction.py
+│   └── 03_api_requests.py
 │
 ├── src/                                            # Main code.
 │   ├── data_requesters                             # Requesters for data on external APIs.

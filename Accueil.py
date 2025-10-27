@@ -29,7 +29,7 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     st.page_link(
-        "pages/01_Carte_Stats_Dataset.py",
+        "pages/data.py",
         label="Explorer la carte et les stats DPE",
         icon="📊",
     )
@@ -40,16 +40,14 @@ with col1:
     """)
 
 with col2:
-    st.page_link("pages/02_Prévision_DPE.py", label="Prédire la classe DPE", icon="🔮")
+    st.page_link("pages/prediction.py", label="Prédire la classe DPE", icon="🔮")
     st.markdown("""
     Utilisez vos **modèles de prédiction (.pkl)** pour estimer la **classe DPE (A → G)** 
     à partir des caractéristiques du logement.
     """)
 
 with col3:
-    st.page_link(
-        "pages/03_Requetes_API.py", label="Requêtes vers l’API ADEME", icon="🌐"
-    )
+    st.page_link("pages/api_requests.py", label="Requêtes vers l’API ADEME", icon="🌐")
     st.markdown("""
     Récupérez des données depuis **l’API ADEME (DPE)**.
     """)

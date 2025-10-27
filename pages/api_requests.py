@@ -1,7 +1,7 @@
-import streamlit as st
 import pandas as pd
-import time
-from src.data_requesters.Ademe import Ademe_API_requester
+import streamlit as st
+
+from src.data_requesters import api_ademe
 
 # Configuration de la page
 st.set_page_config(page_title="Requête ADEME", page_icon="🌐", layout="wide")
@@ -26,8 +26,10 @@ launch = st.button("🚀 Lancer la requête", use_container_width=True)
 
 # Lancement de la requête
 if launch:
-    st.info(f"⏳ Requête en cours vers l’API ADEME pour le département {departement}...")
-    requester = Ademe_API_requester(size=size)
+    st.info(
+        f"⏳ Requête en cours vers l’API ADEME pour le département {departement}..."
+    )
+    requester = api_ademe
 
     progress_bar = st.progress(0)
     status_text = st.empty()
@@ -36,7 +38,11 @@ if launch:
     all_data = []
     try:
         # --- Étape 1 : connaître le nombre total à récupérer
-        url = requester._Ademe_API_requester__base_url_existant if not neuf else requester._Ademe_API_requester__base_url_neuf
+        url = (
+            requester._Ademe_API_requester__base_url_existant
+            if not neuf
+            else requester._Ademe_API_requester__base_url_neuf
+        )
         url += "/lines"
         params = {"qs": f"code_departement_ban:{departement}", "size": size}
 
@@ -55,7 +61,9 @@ if launch:
 
         # --- Étape 2 : récupération progressive
         while next_url and fetched < total_length:
-            data_chunk = requester._Ademe_API_requester__get_data(next_url, params=params)
+            data_chunk = requester._Ademe_API_requester__get_data(
+                next_url, params=params
+            )
             if not data_chunk:
                 break
 
@@ -66,11 +74,13 @@ if launch:
             # Mettre à jour le progrès
             progress = min(fetched / total_length, 1.0)
             progress_bar.progress(progress)
-            status_text.text(f"Récupéré {fetched:,}/{total_length:,} ({progress * 100:.1f}%)")
+            status_text.text(
+                f"Récupéré {fetched:,}/{total_length:,} ({progress * 100:.1f}%)"
+            )
 
             # Aperçu live toutes les 2 secondes
             if fetched % (2 * size) < size and len(all_data) > 0:
-                df_preview = pd.DataFrame(all_data[-min(len(all_data), 50):])
+                df_preview = pd.DataFrame(all_data[-min(len(all_data), 50) :])
                 data_preview.dataframe(df_preview, use_container_width=True, height=250)
 
             next_url = data_chunk.get("next")
@@ -81,7 +91,9 @@ if launch:
 
         # --- Étape 3 : affichage final
         df = pd.DataFrame(all_data)
-        st.success(f"✅ Téléchargement terminé — {len(df):,} enregistrements récupérés.")
+        st.success(
+            f"✅ Téléchargement terminé — {len(df):,} enregistrements récupérés."
+        )
         st.dataframe(df.head(50), use_container_width=True)
 
         # Statistiques rapides
@@ -101,4 +113,6 @@ if launch:
         st.stop()
 
 else:
-    st.info("🪄 Configurez les paramètres et cliquez sur **🚀 Lancer la requête** pour démarrer.")
+    st.info(
+        "🪄 Configurez les paramètres et cliquez sur **🚀 Lancer la requête** pour démarrer."
+    )

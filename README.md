@@ -59,15 +59,15 @@ mon_projet/
 │                    # Utilisé pour des arrières plan de carte
 │
 ├── pages/                                          # Pages from streamlit.
-│   ├── 01_Carte_Stats_Dataset.py
-│   ├── 02_Prévision_DPE.py
-│   └── 03_Requetes_API.py
+│   ├── data.py
+│   ├── prediction.py
+│   └── api_requests.py
 │
 ├── src/                                            # Main code.
 │   ├── data_requesters                             # Requesters for data on external APIs.
-│   │   ├── Ademe.py                                
-│   │   ├── Elevation.py                            
-│   │   ├── Enedis.py
+│   │   ├── ademe.py                                
+│   │   ├── elevation.py                            
+│   │   ├── enedis.py
 │   │   └── helper.py
 │   └── api.py/                                     # FastAPI routes for the application.
 │       └── main.py                                 # main FastAPI file to run the back-end API routes.

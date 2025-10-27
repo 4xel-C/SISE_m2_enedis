@@ -1,13 +1,12 @@
 """
 # Accueil
 """
+
 import streamlit as st
 
 # ⚙️ Configuration générale
 st.set_page_config(
-    page_title="DPE Ademe & Enedis - Accueil",
-    page_icon="🏠",
-    layout="centered"
+    page_title="DPE Ademe & Enedis - Accueil", page_icon="🏠", layout="centered"
 )
 
 # 🏠 Titre et description
@@ -32,7 +31,7 @@ with col1:
     st.page_link(
         "pages/01_Carte_Stats_Dataset.py",
         label="Explorer la carte et les stats DPE",
-        icon="📊"
+        icon="📊",
     )
     st.markdown("""
     Visualisez jusqu’à plusieurs centaines de milliers de logements sur une **carte interactive**.
@@ -41,11 +40,7 @@ with col1:
     """)
 
 with col2:
-    st.page_link(
-        "pages/02_Prévision_DPE.py",
-        label="Prédire la classe DPE",
-        icon="🔮"
-    )
+    st.page_link("pages/02_Prévision_DPE.py", label="Prédire la classe DPE", icon="🔮")
     st.markdown("""
     Utilisez vos **modèles de prédiction (.pkl)** pour estimer la **classe DPE (A → G)** 
     à partir des caractéristiques du logement.
@@ -53,14 +48,12 @@ with col2:
 
 with col3:
     st.page_link(
-        "pages/03_Requetes_API.py",
-        label="Requêtes vers l’API ADEME",
-        icon="🌐"
+        "pages/03_Requetes_API.py", label="Requêtes vers l’API ADEME", icon="🌐"
     )
     st.markdown("""
     Récupérez des données depuis **l’API ADEME (DPE)**.
     """)
-    
+
 st.divider()
 
 # 🧩 Section d’informations complémentaires
@@ -72,4 +65,6 @@ with st.expander("ℹ️ À propos de l’application"):
     - **Dernière mise à jour :** Octobre 2025  
     """)
 
-st.caption("💡 Astuce : utilisez la barre latérale gauche pour naviguer entre les pages.")
+st.caption(
+    "💡 Astuce : utilisez la barre latérale gauche pour naviguer entre les pages."
+)

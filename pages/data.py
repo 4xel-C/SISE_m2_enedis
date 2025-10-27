@@ -1,9 +1,10 @@
-import streamlit as st
-import pandas as pd
 import os
+
+import matplotlib.pyplot as plt
+import pandas as pd
 import pydeck as pdk
 import seaborn as sns
-import matplotlib.pyplot as plt
+import streamlit as st
 
 # Configuration générale
 st.set_page_config(page_title="Carte & Statistiques DPE", page_icon="🗺️", layout="wide")
@@ -16,8 +17,9 @@ data_files = st.file_uploader(
     "Téléchargez un ou plusieurs fichiers CSV",
     type=["csv"],
     accept_multiple_files=True,
-    key="data_files"
+    key="data_files",
 )
+
 
 @st.cache_data
 def load_data(files):
@@ -26,6 +28,7 @@ def load_data(files):
         df = pd.read_csv(f)
         dfs.append(df)
     return pd.concat(dfs, ignore_index=True)
+
 
 # === Paramètres globaux ===
 DEFAULT_POINTS_MAP = 100_000
@@ -57,13 +60,15 @@ if data_files:
             max_value=max_points_possible,
             value=min(DEFAULT_POINTS_MAP, max_points_possible),
             step=1_000,
-            help="Ajustez pour limiter le nombre de points et améliorer la fluidité."
+            help="Ajustez pour limiter le nombre de points et améliorer la fluidité.",
         )
 
         # Échantillonnage aléatoire
         if len(data) > nb_points_map:
             data_map = data.sample(nb_points_map, random_state=42)
-            st.caption(f"🧮 {nb_points_map:,} logements affichés sur {max_points_possible:,}.")
+            st.caption(
+                f"🧮 {nb_points_map:,} logements affichés sur {max_points_possible:,}."
+            )
         else:
             data_map = data
             st.caption(f"🧮 Tous les {len(data):,} logements sont affichés.")
@@ -81,17 +86,17 @@ if data_files:
         layer = pdk.Layer(
             "ScatterplotLayer",
             data=data_map,
-            get_position='[lon, lat]',
-            get_color='[200, 30, 0, 160]',
+            get_position="[lon, lat]",
+            get_color="[200, 30, 0, 160]",
             get_radius=40,
             pickable=True,
         )
 
         tooltip = {
             "html": "<b>Étiquette DPE:</b> {etiquette_dpe}<br/>"
-                    "<b>Coût Total 5 Usages:</b> {cout_total_5_usages}<br/>"
-                    "<b>Lat:</b> {lat}<br/><b>Lon:</b> {lon}",
-            "style": {"backgroundColor": "white", "color": "black"}
+            "<b>Coût Total 5 Usages:</b> {cout_total_5_usages}<br/>"
+            "<b>Lat:</b> {lat}<br/><b>Lon:</b> {lon}",
+            "style": {"backgroundColor": "white", "color": "black"},
         }
 
         deck = pdk.Deck(
@@ -115,7 +120,7 @@ if data_files:
             max_value=max_rows_possible,
             value=min(DEFAULT_ROWS_DISPLAY, max_rows_possible),
             step=1_000,
-            help="Affiche un échantillon aléatoire du dataset pour éviter les ralentissements."
+            help="Affiche un échantillon aléatoire du dataset pour éviter les ralentissements.",
         )
 
         # Échantillonnage pour l’affichage
@@ -141,19 +146,24 @@ if data_files:
             st.bar_chart(dpe_counts, use_container_width=True)
         else:
             st.info("Aucune colonne 'etiquette_dpe' trouvée dans le dataset.")
-        
+
         st.markdown("### Distribution du coût total (5 usages)")
 
         # Catégorisation des coûts
-        bins = [0, 500, 1000, 1500, float('inf')]
+        bins = [0, 500, 1000, 1500, float("inf")]
         labels = ["< 500 €", "500 – 1000 €", "1000 – 1500 €", "> 1500 €"]
 
-        data["cat_cout"] = pd.cut(data["cout_total_5_usages"], bins=bins, labels=labels, right=False, ordered=True)
+        data["cat_cout"] = pd.cut(
+            data["cout_total_5_usages"],
+            bins=bins,
+            labels=labels,
+            right=False,
+            ordered=True,
+        )
         cout_counts = data["cat_cout"].value_counts(sort=False).reindex(labels)
 
         st.bar_chart(cout_counts, use_container_width=True)
         st.dataframe(cout_counts.rename("Nombre de logements"))
-        
 
         if "etiquette_dpe" in data.columns and "cout_total_5_usages" in data.columns:
             st.markdown("### Distribution du coût total selon la classe DPE")
@@ -182,9 +192,11 @@ if data_files:
             ax.set_xlabel("Classe DPE")
             ax.set_ylabel("Coût total (€)")
             st.pyplot(fig)
-        
+
         st.markdown("### Classe DPE dominante par commune")
-        region_dpe = data.groupby("nom_commune_ban")["etiquette_dpe"].agg(lambda x: x.mode()[0] if not x.mode().empty else None)
+        region_dpe = data.groupby("nom_commune_ban")["etiquette_dpe"].agg(
+            lambda x: x.mode()[0] if not x.mode().empty else None
+        )
         st.dataframe(region_dpe)
 
 

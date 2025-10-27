@@ -11,13 +11,16 @@ st.title("🔮 Prédiction de la Classe DPE d’un logement")
 # Chargement des modèles
 ML_DIR = "MLmodels"
 
+
 @st.cache_resource
 def load_pipeline():
     return joblib.load(os.path.join(ML_DIR, "pipeline_xgboost_classification.pkl"))
 
+
 @st.cache_resource
 def load_label_encoder():
     return joblib.load(os.path.join(ML_DIR, "label_encoder_target.pkl"))
+
 
 try:
     pipeline_model = load_pipeline()
@@ -40,15 +43,23 @@ st.markdown("### 🧾 Saisir les caractéristiques du logement")
 
 with st.form("form_pred"):
     st.subheader("🔹 Caractéristiques quantitatives")
-    cout_total_5_usages = st.number_input("Coût total sur 5 usages (€/mois)", 0.0, 5000.0, 500.0)
-    surface_habitable_logement = st.number_input("Surface habitable logement (m²)", 10.0, 400.0, 75.0)
+    cout_total_5_usages = st.number_input(
+        "Coût total sur 5 usages (€/mois)", 0.0, 5000.0, 500.0
+    )
+    surface_habitable_logement = st.number_input(
+        "Surface habitable logement (m²)", 10.0, 400.0, 75.0
+    )
     nombre_niveau_logement = st.number_input("Nombre de niveaux", 1, 10, 2)
     age_batiment = st.number_input("Âge du bâtiment (années)", 0, 150, 33)
     altitude_moyenne = st.number_input("Altitude moyenne (m)", 0, 2000, 100)
 
     st.subheader("🔹 Caractéristiques qualitatives")
-    type_energie_principale_chauffage = st.selectbox("Énergie principale chauffage", ["Autre", "Gaz naturel", "Électricité"])
-    type_batiment = st.selectbox("Type de bâtiment", ["appartement", "maison", "immeuble"])
+    type_energie_principale_chauffage = st.selectbox(
+        "Énergie principale chauffage", ["Autre", "Gaz naturel", "Électricité"]
+    )
+    type_batiment = st.selectbox(
+        "Type de bâtiment", ["appartement", "maison", "immeuble"]
+    )
     zone_climatique = st.selectbox("Zone climatique", ["H1", "H2", "H3"])
 
     submitted = st.form_submit_button("🔮 Prédire la classe DPE")
@@ -65,7 +76,7 @@ if submitted:
         "altitude_moyenne": altitude_moyenne,
         "type_energie_principale_chauffage": type_energie_principale_chauffage,
         "type_batiment": type_batiment,
-        "zone_climatique": zone_climatique
+        "zone_climatique": zone_climatique,
     }
 
     # Créer DataFrame avec toutes les colonnes nécessaires
@@ -99,5 +110,5 @@ if submitted:
         f"<div style='text-align:center; padding:1rem; font-size:2rem; "
         f"background-color:{couleur}; color:white; border-radius:0.5rem;'>"
         f"Classe {y_pred_label[0]}</div>",
-        unsafe_allow_html=True
+        unsafe_allow_html=True,
     )

@@ -1,0 +1,7 @@
+import joblib
+import xgboost
+
+data = joblib.load("C:/Users/Thibaud/Desktop/Machine Learning sous Python/m2_enedis/MLmodels/pipeline_xgboost_classification.pkl")
+
+print(type(data))
+print(data)

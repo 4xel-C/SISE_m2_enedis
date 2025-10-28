@@ -16,8 +16,9 @@ data_files = st.file_uploader(
     "Upload one or more CSV files",
     type=["csv"],
     accept_multiple_files=True,
-    key="data_files"
+    key="data_files",
 )
+
 
 @st.cache_data
 def load_data(files):
@@ -26,6 +27,7 @@ def load_data(files):
         df = pd.read_csv(f)
         dfs.append(df)
     return pd.concat(dfs, ignore_index=True)
+
 
 # === Global parameters ===
 DEFAULT_POINTS_MAP = 100_000
@@ -57,13 +59,15 @@ if data_files:
             max_value=max_points_possible,
             value=min(DEFAULT_POINTS_MAP, max_points_possible),
             step=1_000,
-            help="Adjust to limit the number of points and improve smoothness."
+            help="Adjust to limit the number of points and improve smoothness.",
         )
 
         # Random sampling
         if len(data) > nb_points_map:
             data_map = data.sample(nb_points_map, random_state=42)
-            st.caption(f"🧮 {nb_points_map:,} homes displayed out of {max_points_possible:,}.")
+            st.caption(
+                f"🧮 {nb_points_map:,} homes displayed out of {max_points_possible:,}."
+            )
         else:
             data_map = data
             st.caption(f"🧮 All {len(data):,} homes are displayed.")
@@ -81,17 +85,17 @@ if data_files:
         layer = pdk.Layer(
             "ScatterplotLayer",
             data=data_map,
-            get_position='[lon, lat]',
-            get_color='[200, 30, 0, 160]',
+            get_position="[lon, lat]",
+            get_color="[200, 30, 0, 160]",
             get_radius=40,
             pickable=True,
         )
 
         tooltip = {
             "html": "<b>DPE Label:</b> {etiquette_dpe}<br/>"
-                    "<b>Total Cost (5 Uses):</b> {cout_total_5_usages}<br/>"
-                    "<b>Lat:</b> {lat}<br/><b>Lon:</b> {lon}",
-            "style": {"backgroundColor": "white", "color": "black"}
+            "<b>Total Cost (5 Uses):</b> {cout_total_5_usages}<br/>"
+            "<b>Lat:</b> {lat}<br/><b>Lon:</b> {lon}",
+            "style": {"backgroundColor": "white", "color": "black"},
         }
 
         deck = pdk.Deck(
@@ -115,7 +119,7 @@ if data_files:
             max_value=max_rows_possible,
             value=min(DEFAULT_ROWS_DISPLAY, max_rows_possible),
             step=1_000,
-            help="Displays a random sample of the dataset to avoid slowdowns."
+            help="Displays a random sample of the dataset to avoid slowdowns.",
         )
 
         # Sampling for display
@@ -141,19 +145,24 @@ if data_files:
             st.bar_chart(dpe_counts, use_container_width=True)
         else:
             st.info("No 'etiquette_dpe' column found in the dataset.")
-        
+
         st.markdown("### Distribution of total cost (5 uses)")
 
         # Cost categorization
-        bins = [0, 500, 1000, 1500, float('inf')]
+        bins = [0, 500, 1000, 1500, float("inf")]
         labels = ["< 500 €", "500 – 1000 €", "1000 – 1500 €", "> 1500 €"]
 
-        data["cat_cout"] = pd.cut(data["cout_total_5_usages"], bins=bins, labels=labels, right=False, ordered=True)
+        data["cat_cout"] = pd.cut(
+            data["cout_total_5_usages"],
+            bins=bins,
+            labels=labels,
+            right=False,
+            ordered=True,
+        )
         cout_counts = data["cat_cout"].value_counts(sort=False).reindex(labels)
 
         st.bar_chart(cout_counts, use_container_width=True)
         st.dataframe(cout_counts.rename("Number of homes"))
-        
 
         if "etiquette_dpe" in data.columns and "cout_total_5_usages" in data.columns:
             st.markdown("### Distribution of total cost by DPE class")
@@ -182,9 +191,11 @@ if data_files:
             ax.set_xlabel("DPE class")
             ax.set_ylabel("Total cost (€)")
             st.pyplot(fig)
-        
+
         st.markdown("### Dominant DPE class by municipality")
-        region_dpe = data.groupby("nom_commune_ban")["etiquette_dpe"].agg(lambda x: x.mode()[0] if not x.mode().empty else None)
+        region_dpe = data.groupby("nom_commune_ban")["etiquette_dpe"].agg(
+            lambda x: x.mode()[0] if not x.mode().empty else None
+        )
         st.dataframe(region_dpe)
 
 

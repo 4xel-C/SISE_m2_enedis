@@ -1,99 +1,19 @@
+from pathlib import Path
+
+import pandas as pd
 import requests
 
-CLIMATE_ZONES = {
-    "H1": [
-        1,
-        2,
-        3,
-        5,
-        8,
-        10,
-        14,
-        15,
-        19,
-        21,
-        23,
-        25,
-        27,
-        28,
-        38,
-        39,
-        42,
-        43,
-        45,
-        51,
-        52,
-        54,
-        55,
-        57,
-        58,
-        59,
-        60,
-        61,
-        62,
-        63,
-        67,
-        68,
-        69,
-        70,
-        71,
-        73,
-        74,
-        75,
-        76,
-        77,
-        78,
-        80,
-        87,
-        88,
-        89,
-        90,
-        91,
-        92,
-        93,
-        94,
-        95,
-    ],
-    "H2": [
-        4,
-        7,
-        9,
-        12,
-        16,
-        17,
-        18,
-        22,
-        24,
-        26,
-        29,
-        31,
-        32,
-        33,
-        35,
-        36,
-        37,
-        40,
-        41,
-        44,
-        46,
-        47,
-        48,
-        49,
-        50,
-        53,
-        56,
-        64,
-        65,
-        72,
-        79,
-        81,
-        82,
-        84,
-        85,
-        86,
-    ],
-    "H3": [6, 11, 13, 20, 30, 34, 66, 83],
-}
+BASE_DIR = Path(__file__).resolve().parent.parent
+CLIMATE_ZONES_PATH = BASE_DIR / "data" / "climate_zones.csv"
+
+# Read the file for mapping.
+df_zones = pd.read_csv(CLIMATE_ZONES_PATH)
+
+# Convert in int.
+df_zones["number"] = df_zones["number"].astype(int)
+
+# Create a dict: zone -> list of department numbers.
+CLIMATE_ZONES = df_zones.groupby("zone")["number"].apply(list).to_dict()
 
 
 def _map_dept_to_zone(dept_int: int) -> str:

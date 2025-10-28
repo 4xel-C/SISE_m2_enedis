@@ -31,25 +31,28 @@ if launch:
     st.info(f"⏳ Request in progress to the ADEME API for department {departement}...")
 
     requester = Ademe_API_requester(size=size)
-    progress_bar = st.progress(0)
+    progress_bar = st.progress(0.0)
     status_text = st.empty()
     data_preview = st.empty()
 
     try:
         # Step 1: Retrieve data using the public method
         all_data = []
-        chunk_size = 500  # simulated progress step
         status_text.text("Retrieving data...")
 
-        # The custom_lines_request method allows setting a "limit"
+        # Progress callback used by the requester
+        def progress_cb(current: int, total: int) -> None:
+            frac = (current / total) if total else 0.0
+            progress_bar.progress(min(1.0, frac))
+            status_text.text(f"Retrieved {current:,} / {total:,}")
+
+        # The custom_lines_request method allows setting a "limit" and a progress callback
         all_data = requester.custom_lines_request(
-            neuf=neuf, limit=limit, qs=f"code_departement_ban:{departement}"
+            neuf=neuf, limit=limit, progress_callback=progress_cb, qs=f"code_departement_ban:{departement}"
         )
 
-        # Simulated manual progress (optional for visual feedback)
-        for i in range(0, 101, 10):
-            progress_bar.progress(i / 100)
-            time.sleep(0.05)
+        progress_bar.progress(1.0)
+        status_text.text("Retrieval complete.")
 
         # Step 2: Convert to DataFrame
         if not all_data:

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable, Optional
 
 import requests
 
@@ -57,13 +57,18 @@ class Ademe_API_requester:
         return length
 
     def custom_lines_request(
-        self, neuf: bool = False, limit: int | None = None, **kwargs
+        self,
+        neuf: bool = False,
+        limit: int | None = None,
+        progress_callback: Optional[Callable[[int, int], None]] = None,
+        **kwargs
     ) -> list[dict[str, Any]]:
         """Make a custom request to the lines endpoint with additional parameters, while handling the looping requests for pagination.
 
         Args:
             neuf (bool, optional): Whether to request for new houses. Defaults to False.
             limit (int | None, optional): The number of results we want to limit the request to. Defaults to None.
+            progress_callback (Optional[Callable[[int, int], None]], optional): A callback function to report progress. Defaults to None.
             **kwargs: Additional parameters to include in the request.
 
         Returns:
@@ -83,6 +88,9 @@ class Ademe_API_requester:
         if limit is not None and limit < total_length:
             total_length = limit
 
+        if progress_callback:
+            progress_callback(0, total_length)
+
         if total_length == 0:
             print("No data found for the specified department.")
             return all_data
@@ -97,6 +105,10 @@ class Ademe_API_requester:
 
             data = self.__get_data(url, params=params)
             all_data.extend(data["results"])
+
+            if progress_callback:
+                progress_callback(len(all_data), total_length)
+
             print(
                 f"Fetched {len(data['results'])} records. Total so far: {len(all_data)}/{total_length} ({round(len(all_data) / total_length * 100, 2)}%)"
             )

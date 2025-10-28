@@ -1,9 +1,10 @@
-import streamlit as st
-import pandas as pd
 import os
+
+import matplotlib.pyplot as plt
+import pandas as pd
 import pydeck as pdk
 import seaborn as sns
-import matplotlib.pyplot as plt
+import streamlit as st
 
 # General configuration
 st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layout="wide")
@@ -55,7 +56,7 @@ if data_files:
         max_points_possible = len(data)
         nb_points_map = st.slider(
             "Number of homes displayed on the map 🗺️",
-            min_value=1_000,
+            min_value=0,
             max_value=max_points_possible,
             value=min(DEFAULT_POINTS_MAP, max_points_possible),
             step=1_000,
@@ -115,7 +116,7 @@ if data_files:
         max_rows_possible = len(data)
         nb_rows_display = st.slider(
             "Number of rows displayed in the dataset preview 📄",
-            min_value=1_000,
+            min_value=0,
             max_value=max_rows_possible,
             value=min(DEFAULT_ROWS_DISPLAY, max_rows_possible),
             step=1_000,

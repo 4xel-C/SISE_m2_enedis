@@ -1,7 +1,9 @@
-import streamlit as st
-import pandas as pd
 import time
-from src.data_requesters.Ademe import Ademe_API_requester
+
+import pandas as pd
+import streamlit as st
+
+from src.data_requesters import Ademe_API_requester
 
 # ⚙️ Page configuration
 st.set_page_config(page_title="ADEME Request", page_icon="🌐", layout="wide")

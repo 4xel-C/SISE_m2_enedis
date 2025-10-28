@@ -1,37 +1,44 @@
-import pickle
-
-import numpy as np
 import pandas as pd
-from models.input_model import InputData
 
-from services import BASE_DIR
+from backend.models.input_model import InputData
+from src.data_requesters.elevation import Elevation_API_requester
+from src.data_requesters.geo_features import get_zone_and_altitude
 
-FEATURES_PATH = BASE_DIR / "MLmodels" / "pipeline_xgboost_classification.pkl"
 
+def prepare_data(input_data: InputData) -> pd.DataFrame:
+    """Function to prepare data from the user input in order to feed the ML model.
 
-def prepare_data(input_data: InputData) -> np.ndarray:
-    # Import the features list.
-    with open(FEATURES_PATH, "rb") as f:
-        # Load the features list.
-        features_list = pickle.load(f)
+    Args:
+        input_data (InputData): The data from the user.
 
-        # From the location, get the corresponding features.
-        city = 
+    Returns:
+        pd.DataFrame: The prepared input data for the ML model.
+    """
+    # Get the geographical features
+    geo_info = get_zone_and_altitude(ville=input_data.city)
+    zone_clim = geo_info.get("zone_climatique")
+    lat, lon = geo_info.get("lat"), geo_info.get("lon")
 
-        cities_df = pd.read_csv(BASE_DIR / "data" / "cities_features.csv")
+    if lat is None or lon is None:
+        altitude_moyenne = 0
 
-        # Get the city from the datalist.
+    else:
+        # ---- Step 2: Retrieve elevation
+        elev_requester = Elevation_API_requester()
+        altitude_moyenne = elev_requester.get_elevation(lat, lon) or 0
 
-    # Convert the input data into a NumPy array for the model
-    data = np.array(
-        [
-            input_data.Location,
-            input_data.cost,
-            input_data.area,
-            input_data.n_floors,
-            input_data.age,
-            input_data.main_heating_energy,
-            input_data.building,
-        ]
-    )
-    return data
+    # ---- Prepare input dataframe
+    user_input = {
+        "cout_total_5_usages": input_data.cost,
+        "surface_habitable_logement": input_data.area,
+        "nombre_niveau_logement": input_data.n_floors,
+        "age_batiment": input_data.age,
+        "altitude_moyenne": altitude_moyenne,
+        "type_energie_principale_chauffage": input_data.main_heating_energy,
+        "type_batiment": input_data.building,
+        "zone_climatique": zone_clim,
+    }
+
+    X_input = pd.DataFrame([user_input])
+
+    return X_input

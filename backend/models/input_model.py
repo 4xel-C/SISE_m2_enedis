@@ -16,11 +16,9 @@ class HeatingType(str, Enum):
     autre = "Autre"
 
 
-# -------------------------------- Main Model for the input data.
+# -------------------------------- Main Model for the input data, error and type handling included -------------------------------- #
 class InputData(BaseModel):
-    Location: str | int = Field(
-        ..., description="Location can be a city name, a postal code or an INSEE code."
-    )
+    city: str = Field(..., description="Location must be a city name.")
     cost: float = Field(..., gt=0, description="Cost must be a positive value.")
     area: float = Field(..., gt=0, description="Area must be a positive value.")
     n_floors: int = Field(

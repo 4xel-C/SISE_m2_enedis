@@ -3,17 +3,17 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 CLIMATE_ZONES_PATH = BASE_DIR / "data" / "climate_zones.csv"
 
 # Read the file for mapping.
 df_zones = pd.read_csv(CLIMATE_ZONES_PATH)
 
 # Convert in int.
-df_zones["number"] = df_zones["number"].astype(int)
+df_zones["Departement"] = df_zones["Departement"].astype(int)
 
 # Create a dict: zone -> list of department numbers.
-CLIMATE_ZONES = df_zones.groupby("zone")["number"].apply(list).to_dict()
+CLIMATE_ZONES = df_zones.groupby("Zone climatique")["Departement"].apply(list).to_dict()
 
 
 def _map_dept_to_zone(dept_int: int) -> str:

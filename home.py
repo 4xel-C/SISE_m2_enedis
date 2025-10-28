@@ -29,7 +29,7 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     st.page_link(
-        "pages/01_data.py",
+        "pages/data.py",
         label="Explore the DPE map and statistics",
         icon="📊"
     )
@@ -41,7 +41,7 @@ with col1:
 
 with col2:
     st.page_link(
-        "pages/02_prediction.py",
+        "pages/prediction.py",
         label="Predict DPE class",
         icon="🔮"
     )
@@ -52,7 +52,7 @@ with col2:
 
 with col3:
     st.page_link(
-        "pages/03_api_requests.py",
+        "pages/api_requests.py",
         label="Requests to the ADEME API",
         icon="🌐"
     )

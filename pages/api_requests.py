@@ -1,118 +1,80 @@
-import pandas as pd
 import streamlit as st
+import pandas as pd
+import time
+from src.data_requesters.Ademe import Ademe_API_requester
 
-from src.data_requesters import api_ademe
+# ⚙️ Page configuration
+st.set_page_config(page_title="ADEME Request", page_icon="🌐", layout="wide")
 
-# Configuration de la page
-st.set_page_config(page_title="Requête ADEME", page_icon="🌐", layout="wide")
-
-st.title("🌐 Requêtes vers l’API ADEME")
+st.title("🌐 Requests to the ADEME API")
 st.markdown("""
-Cette page permet de récupérer des données depuis **l’API ADEME (DPE)** en affichant **la progression en temps réel**.  
-Les données sont téléchargées par paquets, pour éviter les longs temps d’attente bloquants.
+This page allows you to retrieve data from **the ADEME (DPE) API**  
+with progress tracking and a preview of the retrieved data.
 """)
 
-# Paramètres de la requête
-st.header("🔧 Paramètres de la requête")
+# 🧭 User parameters
+st.header("🔧 Request parameters")
 
-type_bat = st.radio("Type de bâtiments :", ["Existants", "Neufs"], horizontal=True)
-neuf = type_bat == "Neufs"
+type_bat = st.radio("Building type:", ["Existing", "New"], horizontal=True)
+neuf = type_bat == "New"
 
-departement = st.text_input("Code du département (ex: 75, 13, 59, etc.)", "33")
-limit = st.number_input("Nombre maximal à récupérer", 100, 10_000, 1000, step=500)
-size = st.slider("Taille des paquets API (size)", 100, 2500, 500, step=100)
+departement = st.text_input("Department code (e.g.: 75, 13, 59...)", "33")
+limit = st.number_input("Maximum number to retrieve", 100, 10_000, 1000, step=500)
+size = st.slider("API batch size (size)", 100, 2500, 500, step=100)
 
-launch = st.button("🚀 Lancer la requête", use_container_width=True)
+launch = st.button("🚀 Launch request", use_container_width=True)
 
-# Lancement de la requête
+# 🚀 Request execution
 if launch:
-    st.info(
-        f"⏳ Requête en cours vers l’API ADEME pour le département {departement}..."
-    )
-    requester = api_ademe
+    st.info(f"⏳ Request in progress to the ADEME API for department {departement}...")
 
+    requester = Ademe_API_requester(size=size)
     progress_bar = st.progress(0)
     status_text = st.empty()
     data_preview = st.empty()
 
-    all_data = []
     try:
-        # --- Étape 1 : connaître le nombre total à récupérer
-        url = (
-            requester._Ademe_API_requester__base_url_existant
-            if not neuf
-            else requester._Ademe_API_requester__base_url_neuf
+        # Step 1: Retrieve data using the public method
+        all_data = []
+        chunk_size = 500  # simulated progress step
+        status_text.text("Retrieving data...")
+
+        # The custom_lines_request method allows setting a "limit"
+        all_data = requester.custom_lines_request(
+            neuf=neuf, limit=limit, qs=f"code_departement_ban:{departement}"
         )
-        url += "/lines"
-        params = {"qs": f"code_departement_ban:{departement}", "size": size}
 
-        total_length = requester._Ademe_API_requester__get_length(url, params=params)
-        if limit:
-            total_length = min(limit, total_length)
+        # Simulated manual progress (optional for visual feedback)
+        for i in range(0, 101, 10):
+            progress_bar.progress(i / 100)
+            time.sleep(0.05)
 
-        if total_length == 0:
-            st.warning("Aucune donnée trouvée pour ce département.")
+        # Step 2: Convert to DataFrame
+        if not all_data:
+            st.warning("No data found for this department.")
             st.stop()
 
-        status_text.text(f"Total à récupérer : {total_length:,} lignes")
-        next_url = url
-        fetched = 0
-        params = params.copy()
-
-        # --- Étape 2 : récupération progressive
-        while next_url and fetched < total_length:
-            data_chunk = requester._Ademe_API_requester__get_data(
-                next_url, params=params
-            )
-            if not data_chunk:
-                break
-
-            results = data_chunk.get("results", [])
-            all_data.extend(results)
-            fetched += len(results)
-
-            # Mettre à jour le progrès
-            progress = min(fetched / total_length, 1.0)
-            progress_bar.progress(progress)
-            status_text.text(
-                f"Récupéré {fetched:,}/{total_length:,} ({progress * 100:.1f}%)"
-            )
-
-            # Aperçu live toutes les 2 secondes
-            if fetched % (2 * size) < size and len(all_data) > 0:
-                df_preview = pd.DataFrame(all_data[-min(len(all_data), 50) :])
-                data_preview.dataframe(df_preview, use_container_width=True, height=250)
-
-            next_url = data_chunk.get("next")
-            params = None
-
-            if fetched >= total_length:
-                break
-
-        # --- Étape 3 : affichage final
         df = pd.DataFrame(all_data)
-        st.success(
-            f"✅ Téléchargement terminé — {len(df):,} enregistrements récupérés."
-        )
+
+        st.success(f"✅ Download complete — {len(df):,} records retrieved.")
         st.dataframe(df.head(50), use_container_width=True)
 
-        # Statistiques rapides
+        # Step 3: Quick statistics
         if "etiquette_dpe" in df.columns:
-            st.markdown("### 🏠 Répartition des classes DPE")
+            st.markdown("### 🏠 Distribution of DPE classes")
             st.bar_chart(df["etiquette_dpe"].value_counts().sort_index())
 
+        # Step 4: CSV download
         st.download_button(
-            "💾 Télécharger le résultat (CSV)",
+            "💾 Download result (CSV)",
             data=df.to_csv(index=False).encode("utf-8"),
-            file_name=f"dpe_ademe_{departement}_{'neuf' if neuf else 'existant'}.csv",
+            file_name=f"dpe_ademe_{departement}_{'new' if neuf else 'existing'}.csv",
             mime="text/csv",
         )
 
     except Exception as e:
-        st.error(f"❌ Erreur lors de la requête : {e}")
+        st.error(f"❌ Error during request: {e}")
         st.stop()
 
 else:
-    st.info(
-        "🪄 Configurez les paramètres et cliquez sur **🚀 Lancer la requête** pour démarrer."
-    )
+    st.info("🪄 Configure the parameters and click **🚀 Launch request** to start.")

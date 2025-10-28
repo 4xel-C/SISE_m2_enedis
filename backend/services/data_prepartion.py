@@ -16,7 +16,7 @@ def prepare_data(input_data: InputData) -> np.ndarray:
         features_list = pickle.load(f)
 
         # From the location, get the corresponding features.
-        city = input_data.Location.upper()
+        city = 
 
         cities_df = pd.read_csv(BASE_DIR / "data" / "cities_features.csv")
 

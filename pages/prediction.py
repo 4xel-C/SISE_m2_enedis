@@ -1,9 +1,10 @@
-import streamlit as st
-import pandas as pd
-import joblib
 import os
+import joblib
+import pandas as pd
+import streamlit as st
+
+from src.data_requesters.elevation import Elevation_API_requester
 from src.data_requesters.geo_features import get_zone_and_altitude
-from src.data_requesters.Elevation import Elevation_API_requester
 
 # Page configuration
 st.set_page_config(page_title="DPE Prediction", page_icon="🔮", layout="centered")
@@ -12,13 +13,16 @@ st.title("🔮 Prediction of a Home's DPE Class")
 # Model loading
 ML_DIR = "MLmodels"
 
+
 @st.cache_resource
 def load_pipeline():
     return joblib.load(os.path.join(ML_DIR, "pipeline_xgboost_classification.pkl"))
 
+
 @st.cache_resource
 def load_label_encoder():
     return joblib.load(os.path.join(ML_DIR, "label_encoder_target.pkl"))
+
 
 try:
     pipeline_model = load_pipeline()
@@ -42,11 +46,15 @@ with st.form("form_pred"):
     # ---- New section: City -> automatic zone & altitude ----
     st.subheader("🏙️ Location")
     city = st.text_input("City name", placeholder="e.g. Marseille, Lyon, Lille...")
-    
+
     # ---- Main quantitative inputs ----
     st.subheader("🔹 Quantitative characteristics")
-    cout_total_5_usages = st.number_input("Total cost 5 uses (€/year)", 0.0, 5000.0, 500.0, 10.0)
-    surface_habitable_logement = st.number_input("Living area (m²)", 10.0, 400.0, 75.0, 1.0)
+    cout_total_5_usages = st.number_input(
+        "Total cost 5 uses (€/year)", 0.0, 5000.0, 500.0, 10.0
+    )
+    surface_habitable_logement = st.number_input(
+        "Living area (m²)", 10.0, 400.0, 75.0, 1.0
+    )
     nombre_niveau_logement = st.number_input("Number of floors", 1, 10, 2)
     age_batiment = st.number_input("Building age (years)", 0, 150, 33)
 
@@ -64,7 +72,9 @@ with st.form("form_pred"):
         "Building": "immeuble",
     }
 
-    type_energie_principale_chauffage_label = st.selectbox("Main heating energy", list(energy_options.keys()))
+    type_energie_principale_chauffage_label = st.selectbox(
+        "Main heating energy", list(energy_options.keys())
+    )
     type_batiment_label = st.selectbox("Building type", list(building_options.keys()))
 
     submitted = st.form_submit_button("🔮 Predict DPE class")
@@ -106,7 +116,9 @@ if submitted:
         "nombre_niveau_logement": nombre_niveau_logement,
         "age_batiment": age_batiment,
         "altitude_moyenne": altitude_moyenne,
-        "type_energie_principale_chauffage": energy_options[type_energie_principale_chauffage_label],
+        "type_energie_principale_chauffage": energy_options[
+            type_energie_principale_chauffage_label
+        ],
         "type_batiment": building_options[type_batiment_label],
         "zone_climatique": zone_clim,
     }

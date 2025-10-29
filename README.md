@@ -35,19 +35,19 @@ pour l'instant il faut écrire cette commande dans un terminal python
 
 - *Avec le gestionnaire de package UV :*
 ```sh
-uv run streamlit run Accueil.py
+uv run streamlit run home.py
 ```
 
 - *Sans UV :*
 ```sh
-streamlit run Accueil.py
+streamlit run home.py
 ```
 
 ## Project structure
 ```
 mon_projet/
 │
-├── Accueil.py                                          # Main streamlit app launcher.
+├── home.py                                          # Main streamlit app launcher.
 ├── requirements.txt
 ├── README.md
 ├── pyproject.toml
@@ -68,6 +68,7 @@ mon_projet/
 │   │   ├── ademe.py                                
 │   │   ├── elevation.py                            
 │   │   ├── enedis.py
+│   │   ├── geo_features.py
 │   │   └── helper.py
 │   └── api.py/                                     # FastAPI routes for the application.
 │       └── main.py                                 # main FastAPI file to run the back-end API routes.

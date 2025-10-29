@@ -1,13 +1,12 @@
 """
 # Home
 """
+
 import streamlit as st
 
 # ⚙️ General configuration
 st.set_page_config(
-    page_title="DPE Ademe & Enedis - Home",
-    page_icon="🏠",
-    layout="centered"
+    page_title="DPE Ademe & Enedis - Home", page_icon="🏠", layout="centered"
 )
 
 # 🏠 Title and description
@@ -28,11 +27,7 @@ st.divider()
 col1, col2, col3 = st.columns(3)
 
 with col1:
-    st.page_link(
-        "pages/01_data.py",
-        label="Explore the DPE map and statistics",
-        icon="📊"
-    )
+    st.page_link("pages/data.py", label="Explore the DPE map and statistics", icon="📊")
     st.markdown("""
     Visualize up to hundreds of thousands of homes on an **interactive map**.  
     Filter by region, department, or energy class.  
@@ -40,26 +35,18 @@ with col1:
     """)
 
 with col2:
-    st.page_link(
-        "pages/02_prediction.py",
-        label="Predict DPE class",
-        icon="🔮"
-    )
+    st.page_link("pages/prediction.py", label="Predict DPE class", icon="🔮")
     st.markdown("""
     Use your **prediction models (.pkl)** to estimate the **DPE class (A → G)**  
     based on the home's characteristics.
     """)
 
 with col3:
-    st.page_link(
-        "pages/03_api_requests.py",
-        label="Requests to the ADEME API",
-        icon="🌐"
-    )
+    st.page_link("pages/api_requests.py", label="Requests to the ADEME API", icon="🌐")
     st.markdown("""
     Retrieve data from the **ADEME (DPE) API**.
     """)
-    
+
 st.divider()
 
 # 🧩 Additional information section

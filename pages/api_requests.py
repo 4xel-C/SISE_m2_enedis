@@ -1,7 +1,9 @@
-import streamlit as st
-import pandas as pd
 import time
-from src.data_requesters.Ademe import Ademe_API_requester
+
+import pandas as pd
+import streamlit as st
+
+from src.data_requesters import Ademe_API_requester
 
 # ⚙️ Page configuration
 st.set_page_config(page_title="ADEME Request", page_icon="🌐", layout="wide")
@@ -22,32 +24,35 @@ departement = st.text_input("Department code (e.g.: 75, 13, 59...)", "33")
 limit = st.number_input("Maximum number to retrieve", 100, 10_000, 1000, step=500)
 size = st.slider("API batch size (size)", 100, 2500, 500, step=100)
 
-launch = st.button("🚀 Launch request", use_container_width=True)
+launch = st.button("🚀 Launch request", width="stretch")
 
 # 🚀 Request execution
 if launch:
     st.info(f"⏳ Request in progress to the ADEME API for department {departement}...")
 
     requester = Ademe_API_requester(size=size)
-    progress_bar = st.progress(0)
+    progress_bar = st.progress(0.0)
     status_text = st.empty()
     data_preview = st.empty()
 
     try:
         # Step 1: Retrieve data using the public method
         all_data = []
-        chunk_size = 500  # simulated progress step
         status_text.text("Retrieving data...")
 
-        # The custom_lines_request method allows setting a "limit"
+        # Progress callback used by the requester
+        def progress_cb(current: int, total: int) -> None:
+            frac = (current / total) if total else 0.0
+            progress_bar.progress(min(1.0, frac))
+            status_text.text(f"Retrieved {current:,} / {total:,}")
+
+        # The custom_lines_request method allows setting a "limit" and a progress callback
         all_data = requester.custom_lines_request(
-            neuf=neuf, limit=limit, qs=f"code_departement_ban:{departement}"
+            neuf=neuf, limit=limit, progress_callback=progress_cb, qs=f"code_departement_ban:{departement}"
         )
 
-        # Simulated manual progress (optional for visual feedback)
-        for i in range(0, 101, 10):
-            progress_bar.progress(i / 100)
-            time.sleep(0.05)
+        progress_bar.progress(1.0)
+        status_text.text("Retrieval complete.")
 
         # Step 2: Convert to DataFrame
         if not all_data:
@@ -57,7 +62,7 @@ if launch:
         df = pd.DataFrame(all_data)
 
         st.success(f"✅ Download complete — {len(df):,} records retrieved.")
-        st.dataframe(df.head(50), use_container_width=True)
+        st.dataframe(df.head(50), width='stretch')
 
         # Step 3: Quick statistics
         if "etiquette_dpe" in df.columns:

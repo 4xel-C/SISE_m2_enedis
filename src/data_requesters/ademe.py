@@ -48,7 +48,7 @@ class Ademe_API_requester(BaseAPIRequester):
         neuf: bool = False,
         limit: int | None = None,
         progress_callback: Optional[Callable[[int, int], None]] = None,
-        **kwargs
+        **kwargs,
     ) -> list[dict[str, Any]]:
         """Make a custom request to the lines endpoint with additional parameters, while handling the looping requests for pagination.
 
@@ -91,6 +91,9 @@ class Ademe_API_requester(BaseAPIRequester):
                 break
 
             data = self._get_data(url, params=params)
+            if not data:
+                print("No data could have been fetched, stopping pagination.")
+                break
             all_data.extend(data["results"])
 
             if progress_callback:

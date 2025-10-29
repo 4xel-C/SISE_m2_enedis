@@ -1,5 +1,3 @@
-import time
-
 import pandas as pd
 import streamlit as st
 
@@ -48,7 +46,10 @@ if launch:
 
         # The custom_lines_request method allows setting a "limit" and a progress callback
         all_data = requester.custom_lines_request(
-            neuf=neuf, limit=limit, progress_callback=progress_cb, qs=f"code_departement_ban:{departement}"
+            neuf=neuf,
+            limit=limit,
+            progress_callback=progress_cb,
+            qs=f"code_departement_ban:{departement}",
         )
 
         progress_bar.progress(1.0)

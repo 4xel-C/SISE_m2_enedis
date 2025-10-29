@@ -24,7 +24,7 @@ Select a page below to get started:
 st.divider()
 
 # 🔗 Links to pages
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     st.page_link("pages/data.py", label="Explore the DPE map and statistics", icon="📊")
@@ -45,6 +45,12 @@ with col3:
     st.page_link("pages/api_requests.py", label="Requests to the ADEME API", icon="🌐")
     st.markdown("""
     Retrieve data from the **ADEME (DPE) API**.
+    """)
+
+with col4:
+    st.page_link("pages/stat_test.py", label="Stats Dataset DPE", icon="📈")
+    st.markdown("""
+    Analyze and Visualize key statistics of the DPE dataset. 
     """)
 
 st.divider()

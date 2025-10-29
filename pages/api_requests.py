@@ -24,7 +24,7 @@ departement = st.text_input("Department code (e.g.: 75, 13, 59...)", "33")
 limit = st.number_input("Maximum number to retrieve", 100, 10_000, 1000, step=500)
 size = st.slider("API batch size (size)", 100, 2500, 500, step=100)
 
-launch = st.button("🚀 Launch request", use_container_width=True)
+launch = st.button("🚀 Launch request", width="stretch")
 
 # 🚀 Request execution
 if launch:
@@ -62,7 +62,7 @@ if launch:
         df = pd.DataFrame(all_data)
 
         st.success(f"✅ Download complete — {len(df):,} records retrieved.")
-        st.dataframe(df.head(50), use_container_width=True)
+        st.dataframe(df.head(50), width='stretch')
 
         # Step 3: Quick statistics
         if "etiquette_dpe" in df.columns:

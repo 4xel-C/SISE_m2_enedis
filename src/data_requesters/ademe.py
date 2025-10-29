@@ -1,6 +1,8 @@
 from typing import Any, Callable, Optional
 
+from data_requesters.helper import retry_on_error
 from src.data_requesters.base_api import BaseAPIRequester
+import requests
 
 
 class Ademe_API_requester(BaseAPIRequester):
@@ -218,3 +220,122 @@ class Ademe_API_requester(BaseAPIRequester):
             params = None  # Clear params for subsequent requests.
         # endwhile
         return all_data
+
+    @retry_on_error()
+    def get_dataset_fields(self, neuf: bool = False) -> list[dict[str, Any]]:
+        """Get the list of available fields (variables) from the ADEME API dataset.
+
+        Args:
+            neuf (bool, optional): Whether to get fields for new buildings. Defaults to False (existing buildings).
+
+        Returns:
+            list[dict[str, Any]]: A list of dictionaries containing field information.
+                Each dictionary contains:
+                - key: Field key/name
+                - label: Field label (human-readable name)
+                - type: Data type (string, integer, number, date, etc.)
+                - description: Field description (if available)
+                - x-group: Group category (if available)
+
+        Example:
+            >>> requester = Ademe_API_requester()
+            >>> fields = requester.get_dataset_fields(neuf=False)
+            >>> for field in fields:
+            ...     print(f"{field['key']}: {field['label']} ({field['type']})")
+        """
+        # Get the appropriate base URL
+        url = self.__base_url_neuf if neuf else self.__base_url_existant
+        
+        response = requests.get(url)
+        response.raise_for_status()
+        dataset_info = response.json()
+        
+        # Les champs sont dans "schema" à la racine de la réponse
+        schema = dataset_info.get("schema", [])
+        
+        # Return a simplified version with essential information
+        return [
+            {
+                "key": field.get("key"),
+                "label": field.get("label") or field.get("title") or field.get("key"),
+                "type": field.get("type"),
+                "description": field.get("description") or "",
+                "x-group": field.get("x-group") or "Non classé"
+            }
+            for field in schema
+        ]
+
+    def get_field_names(self, neuf: bool = False) -> list[str]:
+        """Get only the names (keys) of available fields.
+
+        Args:
+            neuf (bool, optional): Whether to get fields for new buildings. Defaults to False.
+
+        Returns:
+            list[str]: A list of field keys.
+
+        Example:
+            >>> requester = Ademe_API_requester()
+            >>> field_names = requester.get_field_names(neuf=False)
+            >>> print(field_names)
+            ['numero_dpe', 'code_postal_ban', 'commune_ban', ...]
+        """
+        fields = self.get_dataset_fields(neuf=neuf)
+        return [field["key"] for field in fields]
+
+    def get_fields_by_group(self, neuf: bool = False) -> dict[str, list[dict[str, Any]]]:
+        """Get fields organized by their group category.
+
+        Args:
+            neuf (bool, optional): Whether to get fields for new buildings. Defaults to False.
+
+        Returns:
+            dict[str, list[dict[str, Any]]]: A dictionary with groups as keys and lists of fields as values.
+
+        Example:
+            >>> requester = Ademe_API_requester()
+            >>> groups = requester.get_fields_by_group(neuf=False)
+            >>> for group, fields in groups.items():
+            ...     print(f"{group}: {len(fields)} fields")
+        """
+        fields = self.get_dataset_fields(neuf=neuf)
+        groups: dict[str, list[dict[str, Any]]] = {}
+        
+        for field in fields:
+            group = field.get("x-group", "Non classé")
+            if group not in groups:
+                groups[group] = []
+            groups[group].append(field)
+        
+        return groups
+
+    def print_available_fields(self, neuf: bool = False) -> None:
+        """Print all available fields in a readable format, organized by group.
+
+        Args:
+            neuf (bool, optional): Whether to print fields for new buildings. Defaults to False.
+
+        Example:
+            >>> requester = Ademe_API_requester()
+            >>> requester.print_available_fields(neuf=False)
+        """
+        fields_by_group = self.get_fields_by_group(neuf=neuf)
+        dataset_type = "Logements neufs" if neuf else "Logements existants"
+        
+        print(f"\n{'='*80}")
+        print(f"Available fields in ADEME API - {dataset_type}")
+        print(f"Total: {sum(len(fields) for fields in fields_by_group.values())} fields")
+        print(f"{'='*80}\n")
+        
+        for group, fields in sorted(fields_by_group.items()):
+            print(f"\n{'─'*80}")
+            print(f"📁 Groupe: {group} ({len(fields)} champs)")
+            print(f"{'─'*80}")
+            
+            for i, field in enumerate(fields, 1):
+                print(f"{i}. {field['key']}")
+                print(f"   Label: {field['label']}")
+                print(f"   Type: {field['type']}")
+                if field['description']:
+                    print(f"   Description: {field['description']}")
+                print()

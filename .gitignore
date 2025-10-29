@@ -182,4 +182,4 @@ cython_debug/
 .cursorindexingignore
 
 # Streamlit
-.streamlit/
+.streamlit/secrets.toml

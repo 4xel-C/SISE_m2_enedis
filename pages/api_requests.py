@@ -68,7 +68,7 @@ if launch:
         # Step 3: Quick statistics
         if "etiquette_dpe" in df.columns:
             st.markdown("### 🏠 Distribution of DPE classes")
-            st.bar_chart(df["etiquette_dpe"].value_counts().sort_index())
+            st.bar_chart(df["etiquette_dpe"].value_counts().sort_index(), use_container_width=True)
 
         # Step 4: CSV download
         st.download_button(

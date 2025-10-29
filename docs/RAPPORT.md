@@ -1,6 +1,14 @@
 # Rapport Machine Learning
 
-## Introduction
+## Tableau de matières 
+1. [Introduction](#1-introduction) 
+2. [Description des données](#2-description-des-données)
+3. [Transformation des données](#3-transformation-des-données)
+4. [Modèle de classification](#4-modèle-de-classification) 
+5. [Modèle de régression](#5-modèle-de-régression)
+6. [Comparaison des modèles](#6-comparaison-des-modèles--classification-et-régression)
+
+## 1. Introduction
 
 Ce rapport a pour but de décrire les étapes et les études réalisées à l'élaboration des modèles de Machine Learning de classification et de régression, en passant par l'exploration des données, la validation des variables d'entraînement, leur traitement, puis les stratégies mises en place pour sélectionner des modèles, et enfin, leur évaluation.
 
@@ -11,14 +19,14 @@ Ce rapport a pour but de décrire les étapes et les études réalisées à l'é
 **Ergonomie d'utilisation:**
 
 - L'utilisateur doit utiliser les modèles pour pouvoir prédire la **classe DPE** de son appartement et/ou **sa consommation**. Ainsi, l'utilisateur doit pouvoir utiliser sa consommation réelle si elle est connue afin d'améliorer la prédiction de sa classe.
-- L'utilisateur de notre application ne pourra fournir qu'une quantité limité de données pour la prédiction de sa classe. Ainsi les données trop techniques, ou difficilement obtenable seront évitées afin de fournir un formulaire de prédiction cohérent.
+- L'utilisateur de notre application ne pourra fournir qu'une quantité limitée de données pour la prédiction de sa classe. Ainsi les données trop techniques, ou difficilement obtenable seront évitées afin de fournir un formulaire de prédiction cohérent.
 
 **Prédictions:**
 
 - Nous souhaitons élaborer un modèle capable de prédire chacune des **7 classes DPE**.
 - Concernant la régression, nous prédirons le **coût total 5 usages**.
   > [!Remarque]
-  > Le coût total 5 usages fait partie de l'enjeu de prédiction de la régression et fait partie des données utiles à l'estimation de la classe DPE. Un utilisateur possédant sa consommation pourra directement s'en servir pour prédire sa classe DPE. Dans le cas où l'utilisateur ne la possède pas, le **modèle de regression prédira la consommation théorique**, et cet élément sera ensuite utilisé pour **une double prédiction pour prédire la classe DPE**.
+  > Le coût total 5 usages fait partie de l'enjeu de prédiction de la régression et fait partie des données utiles à l'estimation de la classe DPE. Un utilisateur possédant sa consommation pourra directement s'en servir pour prédire sa classe DPE. Dans le cas où l'utilisateur ne la possèderait pas, le **modèle de regression prédira la consommation théorique**, et cet élément sera ensuite utilisé pour **une double prédiction pour prédire la classe DPE**.
 
 **Scope:**
 
@@ -26,30 +34,30 @@ Ce rapport a pour but de décrire les étapes et les études réalisées à l'é
 
 ---
 
-## Données
+## 2. Description des données
 
-### Sources
+### Sources des données
 
 **API de l'ademe**
 Source principale des données de l'entraînement des modèles de classification et de régression.
 
-- DPE logements existants: https://data.ademe.fr/datasets/dpe03existant
-- DPE logements neufs: https://data.ademe.fr/datasets/dpe02neuf
+- [DPE logements existants](https://data.ademe.fr/datasets/dpe03existant)
+- [DPE logements neufs](https://data.ademe.fr/datasets/dpe02neuf) 
 
 **Dataset Communes de France**
 Dataset permettant de récupérer l'altitude des communes de France.
 
-- https://www.data.gouv.fr/datasets/communes-france-1/
+- [Communes de France](https://www.data.gouv.fr/datasets/communes-france-1/)
 
 **API Open-Elevation**
 API permettant de récupérer l'altitude à l'aide de la longitude et la latitude, permettant de compléter les données parfois manquantes du _Dataset communes de France_.
 
-- https://open-elevation.com/
+- [API Open-Elevation](https://open-elevation.com/)
 
 **Tableau de répartition des zones climatiques en France**
 Permettant de faire intervenir les différences de climat dans la prédiction.
 
-- https://www.ecologie.gouv.fr/sites/default/files/documents/La%20r%C3%A9partition%20des%20d%C3%A9partements%20par%20zone%20climatique.pdf
+- [Répartition des départements par zone climatique](https://www.ecologie.gouv.fr/sites/default/files/documents/La%20r%C3%A9partition%20des%20d%C3%A9partements%20par%20zone%20climatique.pdf)
 
 ### Extraction des données
 
@@ -61,11 +69,11 @@ Les variables utilisées pour nourrir les modèles de prédiction ont été tri�
 
 - En étudiant la **documentation de l'établissement d'un DPE** et en sélectionnant toutes les variables qui semblent pertinentes et liées à la consommation d'énergie.
 - Parmi de nombreuses variables, celles qui possédaient **des valeurs nulles à hauteur de plus de 10% du dataset** ont été **retirées**.
-- Les variables dont l'information peut être facilement retrouvées ont été privilégiés: ces variables apparaîtront pour la plupart dans le formulaire de prédiction de l'utilisateur, il ne faut donc pas de demande trop _techniques_.
+- Les variables dont l'information peut être facilement retrouvée ont été privilégiées: ces variables apparaîtront pour la plupart dans le formulaire de prédiction de l'utilisateur, il ne faut donc pas de demande trop _techniques_.
 - Les variables de coûts ou de consommation (pour le modèle de classification), toutes très corrélées entre elles, ont été limitées au `coût_total_5_usages` de l'année en cours.
-- Des variables supplémentaires ont été ajoutés de sources externes: **l'altitude et la zone climatique**, pouvant toutes deux influer sur la consommation d'énergie.
+- Des variables supplémentaires ont été ajoutées de sources externes: **l'altitude et la zone climatique**, pouvant toutes deux influer sur la consommation d'énergie.
 
-Ainsi, la liste suivante de variables ont été retenus:
+Ainsi, la liste suivante de variables a été retenue:
 
 | Nom de la variable                      | Description                                            | Unité                                                              | Interprétation                                                                       |
 | --------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
@@ -78,15 +86,17 @@ Ainsi, la liste suivante de variables ont été retenus:
 | **`type_batiment`**                     | Catégorie du bâtiment résidentiel                      | maison individuelle, immeuble collectif, logement intermédiaire... | Reflète les besoins énergétiques moyens.                                             |
 | **`zone_climatique`**                   | Zone climatique de localisation du logement            | H1, H2, H3                                                         | Impacte la rigueur climatique.                                                       |
 
-### Transformation des données
 
-Les données ont été scrupuleusement vérifiées, homogénéisés et transformées pour réduire le bruit. La grande quantité de données que nous avons extraites a permis d'éliminer certains outliers ainsi que certaines valeurs manquantes quand aucune solution raisonnable n'a pu être trouvé. Ci-dessous, le détail des principales transformations effectuées:
+---
+### 3. Transformation des données
 
-- **age du bâtiment**: Calculé à partir de l'année du bâtiment. Transformé en âge pour permettre au modèle d'apprendre plus facilement qu'avec l'année.
+Les données ont été scrupuleusement vérifiées, homogénéisées et transformées pour réduire le bruit. La grande quantité de données que nous avons extraites a permis d'éliminer certains outliers ainsi que certaines valeurs manquantes quand aucune solution raisonnable n'a pu être trouvée. Ci-dessous, le détail des principales transformations effectuées:
+
+- **Age du bâtiment**: Calculé à partir de l'année du bâtiment. Transformé en âge pour permettre au modèle d'apprendre plus facilement qu'avec l'année.
 - **Coût 5 usages**: Utilisation de la méthode _inter-quartile_ pour supprimer les valeurs qui semblaient aberrates.
 - **Type Energie chauffage**: Variable à 14 modalités, dont 2 principales. Les modalités trop rares ont été _groupées_ dans une modalité 'autres'.
 - **Surface logement**: Utilisation de la méthode interquartile pour supprimer les valeurs aberrantes.
-- **Nombre niveau logement**: Les étages ont été limitées à 10 maximum.
+- **Nombre niveau logement**: Les étages ont été limités à 10 maximum.
 - **Type bâtiment**: Suppression des lignes contenant des valeurs manquantes (peu de valeurs nulles).
 - **Altitude**: L'altitude a été récupérée en croisant les données récupérées sur l'API élévation et le dataset des villes de France sur le code INSEE. Les données manquantes ont été moyennées sur le département.
 
@@ -97,7 +107,7 @@ La répartition des classes DPEs après extraction est restée quasiment inchang
 
 ---
 
-## Modèle de classification
+## 4. Modèle de classification
 
 ### Sélection des modèles
 
@@ -110,9 +120,9 @@ Le choix du modèle a été réalisé en testant et comparant plusieurs modèles
 
 ### Préparation des données entraînement/test
 
-**Préparation du set d'entraînement**: Utilisation d'un split **stratifié** 70/30.
-**Pipeline de prétraitement**: un `Scaler` ainsi qu'un `OneHotEncoder` pour centrer réduire les variables d'apprentissage (sauf pour le _RandomForest_).
-**Label Encoder**: Pour labéliser en variable numérique la classe DPE, permettant d'introduire la notion de hiérarchie entre les classes.
+* **Préparation du set d'entraînement**: Utilisation d'un split **stratifié** 70/30.
+* **Pipeline de prétraitement**: un `Scaler` ainsi qu'un `OneHotEncoder` pour centrer réduire les variables d'apprentissage (sauf pour le _RandomForest_).
+* **Label Encoder**: Pour labéliser en variable numérique la classe DPE, permettant d'introduire la notion de hiérarchie entre les classes.
 
 ### Détermination des hyperparamètres pour chacun des modèles.
 
@@ -124,7 +134,7 @@ La méthodologie suivante à été appliquée, en utilisant le même set d'entra
 
 ### Comparaison des algorithmes
 
-Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons tenté d'évaluer la performance des modèles et de les comparer. Nous donc répéter **30** fois la procédure suivante, pour chacun des algorithmes:
+Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons tenté d'évaluer la performance des modèles et de les comparer. Nous donc répéter **30** fois la procédure suivante, pour chacun des algorithmes :
 
 - Re-générer le split Train/Test.
 - Entraîner le modèle et effectuer l'évaluation sur les données d'entraînement. (**balanced_accuracy, accuracy, f1_score, hamming_loss**)
@@ -171,7 +181,7 @@ $$CI = \left( \bar{x} - t_{\alpha/2} \cdot \frac{s}{\sqrt{n}},\; \bar{x} + t_{\a
 
 ### XGBoost: évaluation finale
 
-Les opérations effectuées ci-dessus nous permettent de conclure notre choix pour l'**XGBoost**. Afin d'estimer la véritable efficacité de notre algorithme. Nous effectuons un dernier split des données pour un entraînement et un test. Nous pouvons ainsi générer la **matrice de confusion** suivante qui complémente les précédentes mesures:
+Les opérations effectuées ci-dessus nous permettent de conclure notre choix pour l'**XGBoost**. Afin d'estimer la véritable efficacité de notre algorithme. Nous effectuons un dernier split des données pour un entraînement et un test. Nous pouvons ainsi générer la **matrice de confusion** suivante qui complémente les précédentes mesures :
 
 <img width="798" height="621" alt="image" src="https://github.com/user-attachments/assets/e9ce3ae5-ab99-4559-b62e-afd7071b037f" />
 
@@ -179,17 +189,17 @@ Les opérations effectuées ci-dessus nous permettent de conclure notre choix po
 
 ### Importance des variables
 
-La librairie **XGBoost** permettant de monter le modèle offre le moyen de récupérer l'importance des variables dans la determination des classes. Cette "importance" est déterminé selon deux critères:
+La librairie **XGBoost** permettant de monter le modèle offre le moyen de récupérer l'importance des variables dans la determination des classes. Cette "importance" est déterminée selon deux critères :
 
 - Le nombre de fois où la variable à été **utilisée pour séparer un nœud de l'arbre**.
 - L'importance du **Gain** engendré par la séparation de la variable (réduction de l'enthropie ou de l'impureté de Gini)
   <img width="1263" height="673" alt="image" src="https://github.com/user-attachments/assets/b4ed71e7-dc35-407c-a48e-5e6aecb2219f" />
 
-Ainsi notre modèle se base principalement sur **l'âge du bâtiment**, **le type d'énergie principale pour le chauffage**, et le **type du bâtiment**.
+Ainsi, notre modèle se base principalement sur **l'âge du bâtiment**, **le type d'énergie principale pour le chauffage**, et le **type du bâtiment**.
 
 ---
 
-## Modèle de régression
+## 5. Modèle de régression
 
 ### Sélection des modèles
 
@@ -202,9 +212,8 @@ Le choix du modèle a été réalisé en testant et comparant plusieurs modèles
 
 ### Préparation des données entraînement/test
 
-**Préparation du set d'entraînement** : Utilisation d'un split **70/30** (pas de stratification nécessaire pour la régression).
-
-**Pipeline de prétraitement** : un `StandardScaler` ainsi qu'un `OneHotEncoder` pour centrer réduire les variables quantitatives et encoder les variables qualitatives (sauf pour les modèles basés sur les arbres comme Random Forest et Decision Tree qui ne nécessitent pas de standardisation).
+* **Préparation du set d'entraînement** : Utilisation d'un split **70/30** (pas de stratification nécessaire pour la régression).
+* **Pipeline de prétraitement** : un `StandardScaler` ainsi qu'un `OneHotEncoder` pour centrer réduire les variables quantitatives et encoder les variables qualitatives (sauf pour les modèles basés sur les arbres comme Random Forest et Decision Tree qui ne nécessitent pas de standardisation).
 
 **Variables utilisées** : Les mêmes que pour la classification, à l'exception de `cout_total_5_usages` qui devient la **variable cible** au lieu d'être une feature :
 
@@ -217,15 +226,14 @@ Le choix du modèle a été réalisé en testant et comparant plusieurs modèles
 
 ### Détermination des hyperparamètres pour chacun des modèles
 
-La méthodologie suivante a été appliquée, en utilisant le même set d'entraînement pour tous les algorithmes :
+La méthodologie suivante a été mise en œuvre, en appliquant le même set d'entraînement pour tous les algorithmes :
 
 - Recherche des meilleurs hyper-paramètres pour chacun des algorithmes à l'aide d'un **GridSearchCV** et un paramétrage de **5 folds** pour la **validation croisée**.
 - Suivi des expériences à l'aide de la librairie **MLFlow**.
 - La **métrique** utilisée pour comparer les modèles est la **MAE (Mean Absolute Error)** négative, permettant d'évaluer l'erreur moyenne de prédiction en euros.
 
 ### Comparaison des algorithmes
-
-Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons évalué la performance des modèles et les avons comparés. Nous avons donc répété **30** fois la procédure suivante, pour chacun des algorithmes :
+Après avoir déterminé les hyperparamètres de chaque algorithme, nous avons évalué la performance des modèles et procédé à leur comparaison. La procédure suivante a été répétée **30** fois pour chacun des algorithmes :
 
 - Re-générer le split Train/Test.
 - Entraîner le modèle et effectuer l'évaluation sur les données de test. (**MAE, RMSE, R²**)
@@ -242,7 +250,7 @@ $$CI = \left( \bar{x} - t_{\alpha/2} \cdot \frac{s}{\sqrt{n}},\; \bar{x} + t_{\a
 
 ### Résultats de performance
 
-**Tableau récapitulatif des performances :**
+**Tableau récapitulatif des performances**
 
 | **Modèle**               | **Métrique** | **Moyenne (mean)** | **Écart-type (std)** | **IC95%**        |
 | ------------------------ | ------------ | ------------------ | -------------------- | ---------------- |
@@ -269,26 +277,21 @@ $$CI = \left( \bar{x} - t_{\alpha/2} \cdot \frac{s}{\sqrt{n}},\; \bar{x} + t_{\a
 |                          | R²           | 0.1278             | 0.0015               | [0.1273, 0.1284] |
 
 ### Analyse des résultats
+observations majeures : 
+- **KNN domine clairement** : Il obtient les meilleures performances sur toutes les métriques (MAE, RMSE, R²) avec une large avance.
+- **Modèles linéaires performants** : Les modèles linéaires (Lasso, Ridge, Linear Regression) obtiennent des performances intermédiaires très similaires, avec un R² autour de 0.57.
+-  **Modèles à arbres sous-performants** : Random Forest, Decision Tree et XGBoost montrent des performances décevantes (R² ≈ 0.13), suggérant un possible **surapprentissage** ou une inadéquation des hyperparamètres pour ce problème spécifique.
+- **Stabilité excellente** : Les intervalles de confiance sont très étroits pour tous les modèles, indiquant une grande stabilité des prédictions.
 
-**Observations majeures :**
+### K-Nearest Neighbors (KNN): évaluation finale
 
-1. **KNN domine clairement** : Il obtient les meilleures performances sur **toutes les métriques** (MAE, RMSE, R²) avec une large avance.
+Le modèle **KNN** a été sélectionné pour la prédiction du coût énergétique, car il obtient les meilleures performances sur **3/3 métriques** :
 
-2. **Modèles linéaires performants** : Les modèles linéaires (Lasso, Ridge, Linear Regression) obtiennent des performances intermédiaires très similaires, avec un R² autour de 0.57.
-
-3. **Modèles à arbres sous-performants** : Random Forest, Decision Tree et XGBoost montrent des performances décevantes (R² ≈ 0.13), suggérant un possible **surapprentissage** ou une inadéquation des hyperparamètres pour ce problème spécifique.
-
-4. **Stabilité excellente** : Les intervalles de confiance sont très étroits pour tous les modèles, indiquant une grande **stabilité** des prédictions.
-
-### KNN: évaluation finale
-
-Le modèle **KNN (K-Nearest Neighbors)** a été sélectionné pour la prédiction du coût énergétique, car il obtient les meilleures performances sur **3/3 métriques** :
-
-- **MAE** : 184.07 ± 0.60 euros
-- **RMSE** : 312.38 ± 1.03 euros
+- **MAE** : 184.07 ± 0.60 €
+- **RMSE** : 312.38 ± 1.03 €
 - **R²** : 0.7456 ± 0.0014
 
-Le coefficient R² de **0.7456** indique que le modèle explique environ **74.6%** de la variance du coût énergétique, ce qui constitue une **excellente performance** pour ce type de prédiction.
+> Le coefficient **R²** de 0,7456 indique que le modèle explique environ **74,6 %** de la variance du coût énergétique, ce qui constitue une excellente performance pour ce type de prédiction.
 
 **Interprétation pratique :**
 
@@ -296,16 +299,16 @@ Le coefficient R² de **0.7456** indique que le modèle explique environ **74.6%
 - L'erreur quadratique moyenne (RMSE) de **312 €** indique que la majorité des prédictions se situent dans cette plage d'erreur
 - Ces performances permettent une **estimation fiable** du coût énergétique pour l'utilisateur final
 
-### Comparaison avec le modèle de classification
+---
 
-**Points communs :**
+## 6. Comparaison des modèles : classification et régression
 
+#### Points communs :
 - Même méthodologie rigoureuse (GridSearchCV, 30 répétitions, IC95%)
 - Même preprocessing pipeline (StandardScaler + OneHotEncoder)
 - Tracking MLFlow pour la traçabilité
 
-**Différences notables :**
-
+#### Différences notables :
 - **Meilleur modèle différent** : KNN pour la régression vs XGBoost pour la classification
 - **Performance globale** : R² de 0.75 (régression) vs Balanced Accuracy de 0.74 (classification)
 - Les modèles à arbres (XGBoost, Random Forest) excellent en classification mais sous-performent en régression sur ce dataset

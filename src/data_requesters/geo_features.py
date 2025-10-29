@@ -135,5 +135,4 @@ class Geo_API_requester(BaseAPIRequester):
             result["dept"], "H1"
         )  # Use the most common zone as default
 
-        print(result)
         return result

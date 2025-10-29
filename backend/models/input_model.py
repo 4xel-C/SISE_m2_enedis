@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -21,7 +22,11 @@ class InputData(BaseModel):
     city: str = Field(
         ..., description="Location must be a city name or an INSEE code (as string)"
     )
-    cost: float = Field(..., gt=0, description="Cost must be a positive value.")
+    cost: Optional[float] = Field(
+        None,
+        gt=0,
+        description="Cost must be a positive value if provided. If not, regression model will be used to predict the cost.",
+    )
     area: float = Field(..., gt=0, description="Area must be a positive value.")
     n_floors: int = Field(
         ..., gt=0, description="Number of floors must be a positive value."

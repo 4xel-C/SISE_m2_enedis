@@ -14,6 +14,9 @@ st.title("🔮 Prediction of a Home's DPE Class")
 # Model loading
 ML_DIR = "MLmodels"
 
+# assets folder
+ASSETS = "assets"
+
 
 @st.cache_resource
 def load_pipeline_classification():
@@ -185,9 +188,13 @@ if submitted:
         )
 
     st.success(f"✅ Predicted DPE class: **{y_pred_label[0]}**")
-    st.markdown(
-        f"<div style='text-align:center; padding:1rem; font-size:2rem; "
-        f"background-color:{couleur}; color:white; border-radius:0.5rem;'>"
-        f"Class {y_pred_label[0]}</div>",
-        unsafe_allow_html=True,
-    )
+
+    # select the correct icon name.
+    icon = f"DPE-{y_pred_label[0].upper()}.png"
+
+    # Create columns to center the image
+    col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col2:
+        # Adding the logo of the DPE.
+        st.image(os.path.join(ASSETS, icon), width=200)

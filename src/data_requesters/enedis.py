@@ -60,10 +60,8 @@ class Enedis_API_requester(BaseAPIRequester):
         response.raise_for_status()
         dataset_info = response.json()
         
-        # Les champs sont directement dans "fields" à la racine de la réponse
         fields = dataset_info.get("fields", [])
         
-        # Return a simplified version with essential information
         return [
             {
                 "name": field.get("name"),

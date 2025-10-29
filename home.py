@@ -27,10 +27,13 @@ st.divider()
 col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
-    st.page_link("pages/contexte.py", label="Project Context", icon="📋")
+    st.page_link("pages/context.py", label="Data Context", icon="📋")
     st.markdown("""
-    Learn about the **project background**, data sources (ADEME, Enedis), 
-    technical stack, and methodology.
+    Overview of available data and schemas.  
+    - Live variables from ADEME & Enedis APIs  
+    - Communes, climate zones, elevation  
+    - Prediction inputs and processing workflow  
+    - Data quality and sources
     """)
 
 with col2:

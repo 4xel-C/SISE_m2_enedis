@@ -250,10 +250,8 @@ class Ademe_API_requester(BaseAPIRequester):
         response.raise_for_status()
         dataset_info = response.json()
         
-        # Les champs sont dans "schema" à la racine de la réponse
         schema = dataset_info.get("schema", [])
         
-        # Return a simplified version with essential information
         return [
             {
                 "key": field.get("key"),

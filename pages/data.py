@@ -106,7 +106,7 @@ if data_files:
             tooltip=tooltip,
         )
 
-        st.pydeck_chart(deck, width="stretch")
+        st.pydeck_chart(deck, use_container_width=True)
 
     # --- Tab 2: Statistics ---
     with tab2:
@@ -143,7 +143,7 @@ if data_files:
         if "etiquette_dpe" in data.columns:
             st.markdown("### Distribution of DPE classes")
             dpe_counts = data["etiquette_dpe"].value_counts().sort_index()
-            st.bar_chart(dpe_counts, width="stretch")
+            st.bar_chart(dpe_counts, use_container_width=True)
         else:
             st.info("No 'etiquette_dpe' column found in the dataset.")
 
@@ -162,7 +162,7 @@ if data_files:
         )
         cout_counts = data["cat_cout"].value_counts(sort=False).reindex(labels)
 
-        st.bar_chart(cout_counts, width="stretch")
+        st.bar_chart(cout_counts, use_container_width=True)
         st.dataframe(cout_counts.rename("Number of homes"))
 
         if "etiquette_dpe" in data.columns and "cout_total_5_usages" in data.columns:

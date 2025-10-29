@@ -6,7 +6,7 @@
 3. [Transformation des données](#3-transformation-des-données)
 4. [Modèle de classification](#4-modèle-de-classification) 
 5. [Modèle de régression](#5-modèle-de-régression)
-6. [Comparaison des modèles](#6-comparaison-du-modèle-régression-avec-le-modèle-de-classification)
+6. [Comparaison des modèles](#6-comparaison-des-modèles--classification-et-régression)
 
 ## 1. Introduction
 
@@ -19,14 +19,14 @@ Ce rapport a pour but de décrire les étapes et les études réalisées à l'é
 **Ergonomie d'utilisation:**
 
 - L'utilisateur doit utiliser les modèles pour pouvoir prédire la **classe DPE** de son appartement et/ou **sa consommation**. Ainsi, l'utilisateur doit pouvoir utiliser sa consommation réelle si elle est connue afin d'améliorer la prédiction de sa classe.
-- L'utilisateur de notre application ne pourra fournir qu'une quantité limité de données pour la prédiction de sa classe. Ainsi les données trop techniques, ou difficilement obtenable seront évitées afin de fournir un formulaire de prédiction cohérent.
+- L'utilisateur de notre application ne pourra fournir qu'une quantité limitée de données pour la prédiction de sa classe. Ainsi les données trop techniques, ou difficilement obtenable seront évitées afin de fournir un formulaire de prédiction cohérent.
 
 **Prédictions:**
 
 - Nous souhaitons élaborer un modèle capable de prédire chacune des **7 classes DPE**.
 - Concernant la régression, nous prédirons le **coût total 5 usages**.
   > [!Remarque]
-  > Le coût total 5 usages fait partie de l'enjeu de prédiction de la régression et fait partie des données utiles à l'estimation de la classe DPE. Un utilisateur possédant sa consommation pourra directement s'en servir pour prédire sa classe DPE. Dans le cas où l'utilisateur ne la possède pas, le **modèle de regression prédira la consommation théorique**, et cet élément sera ensuite utilisé pour **une double prédiction pour prédire la classe DPE**.
+  > Le coût total 5 usages fait partie de l'enjeu de prédiction de la régression et fait partie des données utiles à l'estimation de la classe DPE. Un utilisateur possédant sa consommation pourra directement s'en servir pour prédire sa classe DPE. Dans le cas où l'utilisateur ne la possèderait pas, le **modèle de regression prédira la consommation théorique**, et cet élément sera ensuite utilisé pour **une double prédiction pour prédire la classe DPE**.
 
 **Scope:**
 
@@ -69,11 +69,11 @@ Les variables utilisées pour nourrir les modèles de prédiction ont été tri�
 
 - En étudiant la **documentation de l'établissement d'un DPE** et en sélectionnant toutes les variables qui semblent pertinentes et liées à la consommation d'énergie.
 - Parmi de nombreuses variables, celles qui possédaient **des valeurs nulles à hauteur de plus de 10% du dataset** ont été **retirées**.
-- Les variables dont l'information peut être facilement retrouvées ont été privilégiés: ces variables apparaîtront pour la plupart dans le formulaire de prédiction de l'utilisateur, il ne faut donc pas de demande trop _techniques_.
+- Les variables dont l'information peut être facilement retrouvée ont été privilégiées: ces variables apparaîtront pour la plupart dans le formulaire de prédiction de l'utilisateur, il ne faut donc pas de demande trop _techniques_.
 - Les variables de coûts ou de consommation (pour le modèle de classification), toutes très corrélées entre elles, ont été limitées au `coût_total_5_usages` de l'année en cours.
-- Des variables supplémentaires ont été ajoutés de sources externes: **l'altitude et la zone climatique**, pouvant toutes deux influer sur la consommation d'énergie.
+- Des variables supplémentaires ont été ajoutées de sources externes: **l'altitude et la zone climatique**, pouvant toutes deux influer sur la consommation d'énergie.
 
-Ainsi, la liste suivante de variables ont été retenus:
+Ainsi, la liste suivante de variables a été retenue:
 
 | Nom de la variable                      | Description                                            | Unité                                                              | Interprétation                                                                       |
 | --------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
@@ -90,13 +90,13 @@ Ainsi, la liste suivante de variables ont été retenus:
 ---
 ### 3. Transformation des données
 
-Les données ont été scrupuleusement vérifiées, homogénéisés et transformées pour réduire le bruit. La grande quantité de données que nous avons extraites a permis d'éliminer certains outliers ainsi que certaines valeurs manquantes quand aucune solution raisonnable n'a pu être trouvé. Ci-dessous, le détail des principales transformations effectuées:
+Les données ont été scrupuleusement vérifiées, homogénéisées et transformées pour réduire le bruit. La grande quantité de données que nous avons extraites a permis d'éliminer certains outliers ainsi que certaines valeurs manquantes quand aucune solution raisonnable n'a pu être trouvée. Ci-dessous, le détail des principales transformations effectuées:
 
 - **Age du bâtiment**: Calculé à partir de l'année du bâtiment. Transformé en âge pour permettre au modèle d'apprendre plus facilement qu'avec l'année.
 - **Coût 5 usages**: Utilisation de la méthode _inter-quartile_ pour supprimer les valeurs qui semblaient aberrates.
 - **Type Energie chauffage**: Variable à 14 modalités, dont 2 principales. Les modalités trop rares ont été _groupées_ dans une modalité 'autres'.
 - **Surface logement**: Utilisation de la méthode interquartile pour supprimer les valeurs aberrantes.
-- **Nombre niveau logement**: Les étages ont été limitées à 10 maximum.
+- **Nombre niveau logement**: Les étages ont été limités à 10 maximum.
 - **Type bâtiment**: Suppression des lignes contenant des valeurs manquantes (peu de valeurs nulles).
 - **Altitude**: L'altitude a été récupérée en croisant les données récupérées sur l'API élévation et le dataset des villes de France sur le code INSEE. Les données manquantes ont été moyennées sur le département.
 
@@ -134,7 +134,7 @@ La méthodologie suivante à été appliquée, en utilisant le même set d'entra
 
 ### Comparaison des algorithmes
 
-Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons tenté d'évaluer la performance des modèles et de les comparer. Nous donc répéter **30** fois la procédure suivante, pour chacun des algorithmes:
+Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons tenté d'évaluer la performance des modèles et de les comparer. Nous donc répéter **30** fois la procédure suivante, pour chacun des algorithmes :
 
 - Re-générer le split Train/Test.
 - Entraîner le modèle et effectuer l'évaluation sur les données d'entraînement. (**balanced_accuracy, accuracy, f1_score, hamming_loss**)
@@ -181,7 +181,7 @@ $$CI = \left( \bar{x} - t_{\alpha/2} \cdot \frac{s}{\sqrt{n}},\; \bar{x} + t_{\a
 
 ### XGBoost: évaluation finale
 
-Les opérations effectuées ci-dessus nous permettent de conclure notre choix pour l'**XGBoost**. Afin d'estimer la véritable efficacité de notre algorithme. Nous effectuons un dernier split des données pour un entraînement et un test. Nous pouvons ainsi générer la **matrice de confusion** suivante qui complémente les précédentes mesures:
+Les opérations effectuées ci-dessus nous permettent de conclure notre choix pour l'**XGBoost**. Afin d'estimer la véritable efficacité de notre algorithme. Nous effectuons un dernier split des données pour un entraînement et un test. Nous pouvons ainsi générer la **matrice de confusion** suivante qui complémente les précédentes mesures :
 
 <img width="798" height="621" alt="image" src="https://github.com/user-attachments/assets/e9ce3ae5-ab99-4559-b62e-afd7071b037f" />
 
@@ -189,13 +189,13 @@ Les opérations effectuées ci-dessus nous permettent de conclure notre choix po
 
 ### Importance des variables
 
-La librairie **XGBoost** permettant de monter le modèle offre le moyen de récupérer l'importance des variables dans la determination des classes. Cette "importance" est déterminé selon deux critères:
+La librairie **XGBoost** permettant de monter le modèle offre le moyen de récupérer l'importance des variables dans la determination des classes. Cette "importance" est déterminée selon deux critères :
 
 - Le nombre de fois où la variable à été **utilisée pour séparer un nœud de l'arbre**.
 - L'importance du **Gain** engendré par la séparation de la variable (réduction de l'enthropie ou de l'impureté de Gini)
   <img width="1263" height="673" alt="image" src="https://github.com/user-attachments/assets/b4ed71e7-dc35-407c-a48e-5e6aecb2219f" />
 
-Ainsi notre modèle se base principalement sur **l'âge du bâtiment**, **le type d'énergie principale pour le chauffage**, et le **type du bâtiment**.
+Ainsi, notre modèle se base principalement sur **l'âge du bâtiment**, **le type d'énergie principale pour le chauffage**, et le **type du bâtiment**.
 
 ---
 
@@ -277,7 +277,7 @@ $$CI = \left( \bar{x} - t_{\alpha/2} \cdot \frac{s}{\sqrt{n}},\; \bar{x} + t_{\a
 |                          | R²           | 0.1278             | 0.0015               | [0.1273, 0.1284] |
 
 ### Analyse des résultats
-observations majeures: 
+observations majeures : 
 - **KNN domine clairement** : Il obtient les meilleures performances sur toutes les métriques (MAE, RMSE, R²) avec une large avance.
 - **Modèles linéaires performants** : Les modèles linéaires (Lasso, Ridge, Linear Regression) obtiennent des performances intermédiaires très similaires, avec un R² autour de 0.57.
 -  **Modèles à arbres sous-performants** : Random Forest, Decision Tree et XGBoost montrent des performances décevantes (R² ≈ 0.13), suggérant un possible **surapprentissage** ou une inadéquation des hyperparamètres pour ce problème spécifique.

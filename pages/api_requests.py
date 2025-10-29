@@ -1,5 +1,3 @@
-import time
-
 import pandas as pd
 import streamlit as st
 
@@ -48,7 +46,10 @@ if launch:
 
         # The custom_lines_request method allows setting a "limit" and a progress callback
         all_data = requester.custom_lines_request(
-            neuf=neuf, limit=limit, progress_callback=progress_cb, qs=f"code_departement_ban:{departement}"
+            neuf=neuf,
+            limit=limit,
+            progress_callback=progress_cb,
+            qs=f"code_departement_ban:{departement}",
         )
 
         progress_bar.progress(1.0)
@@ -67,7 +68,7 @@ if launch:
         # Step 3: Quick statistics
         if "etiquette_dpe" in df.columns:
             st.markdown("### 🏠 Distribution of DPE classes")
-            st.bar_chart(df["etiquette_dpe"].value_counts().sort_index())
+            st.bar_chart(df["etiquette_dpe"].value_counts().sort_index(), use_container_width=True)
 
         # Step 4: CSV download
         st.download_button(

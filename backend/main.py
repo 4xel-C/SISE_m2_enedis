@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.models.input_model import InputData
-from backend.services.prediction import predict_classification
+from backend.services.prediction import predict_cost_dpe
 
 app = FastAPI(title="DEP and consumption prediction API")
 
@@ -19,5 +19,5 @@ app.add_middleware(
 
 @app.post("/predict")
 def predict_route(data: InputData):
-    result = predict_classification(features=data)
+    result = predict_cost_dpe(features=data)
     return result

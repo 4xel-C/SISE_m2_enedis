@@ -24,9 +24,19 @@ Select a page below to get started:
 st.divider()
 
 # 🔗 Links to pages
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4, col5 = st.columns(5)
 
 with col1:
+    st.page_link("pages/context.py", label="Data Context", icon="📋")
+    st.markdown("""
+    Overview of available data and schemas.  
+    - Live variables from ADEME & Enedis APIs  
+    - Communes, climate zones, elevation  
+    - Prediction inputs and processing workflow  
+    - Data quality and sources
+    """)
+
+with col2:
     st.page_link("pages/data.py", label="Explore the DPE map and statistics", icon="📊")
     st.markdown("""
     Visualize up to hundreds of thousands of homes on an **interactive map**.  
@@ -34,17 +44,23 @@ with col1:
     Quickly explore the main characteristics of your dataset: distributions, missing values, and descriptive statistics to better understand your data.
     """)
 
-with col2:
+with col3:
     st.page_link("pages/prediction.py", label="Predict DPE class", icon="🔮")
     st.markdown("""
     Use your **prediction models (.pkl)** to estimate the **DPE class (A → G)**  
     based on the home's characteristics.
     """)
 
-with col3:
+with col4:
     st.page_link("pages/api_requests.py", label="Requests to the ADEME API", icon="🌐")
     st.markdown("""
     Retrieve data from the **ADEME (DPE) API**.
+    """)
+
+with col5:
+    st.page_link("pages/stat_test.py", label="Stats Dataset DPE", icon="📈")
+    st.markdown("""
+    Analyze and Visualize key statistics of the DPE dataset. 
     """)
 
 st.divider()

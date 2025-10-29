@@ -1,11 +1,9 @@
 from typing import Any
 
-import requests
-
-from src.data_requesters.helper import retry_on_error
+from src.data_requesters.base_api import BaseAPIRequester
 
 
-class Ademe_API_requester:
+class Ademe_API_requester(BaseAPIRequester):
     """
     A class to interact with the ADEME API.
     """
@@ -30,17 +28,6 @@ class Ademe_API_requester:
         """
         self.__size: int = size
 
-    @retry_on_error()
-    def __get_data(self, url: str, params: dict[str, Any] | None = None) -> dict | None:
-        """Private method to get the crude data from the API passing the base URL and parameters.
-
-        Returns:
-            dict: The JSON response from the API or an error message.
-        """
-        response = requests.get(url, params=params)
-        response.raise_for_status()  # Raise an error for bad responses.
-        return response.json()
-
     def __get_length(self, url: str, params: dict[str, Any] | None = None) -> int:
         """Private method to get the total number of results from the API for monitoring progress.
 
@@ -52,7 +39,7 @@ class Ademe_API_requester:
         # Change the size of the parameter to 1 to speed up the request for total length.
         params = params | {"size": 1} if params else {"size": 1}
 
-        data = self.__get_data(url, params=params)
+        data = self._get_data(url, params=params)
         length = data.get("total", 0) if data else 0
         return length
 
@@ -95,7 +82,7 @@ class Ademe_API_requester:
             if limit is not None and len(all_data) >= limit:
                 break
 
-            data = self.__get_data(url, params=params)
+            data = self._get_data(url, params=params)
             all_data.extend(data["results"])
             print(
                 f"Fetched {len(data['results'])} records. Total so far: {len(all_data)}/{total_length} ({round(len(all_data) / total_length * 100, 2)}%)"
@@ -143,7 +130,7 @@ class Ademe_API_requester:
 
         # Pagination loop.
         while url:
-            data = self.__get_data(url, params=params)
+            data = self._get_data(url, params=params)
             all_data.extend(data["results"])
             print(
                 f"Fetched {len(data['results'])} records. Total so far: {len(all_data)}/{total_length} ({round(len(all_data) / total_length * 100, 2)}%)"
@@ -167,7 +154,7 @@ class Ademe_API_requester:
         url = self.__base_url_existant if not neuf else self.__base_url_neuf
         url += "/values_agg"  # Endpoint for values aggregation.
 
-        data = self.__get_data(
+        data = self._get_data(
             url, params={"agg_size": 400, "field": "code_departement_ban"}
         )
 
@@ -207,7 +194,7 @@ class Ademe_API_requester:
 
         # Pagination loop.
         while url:
-            data = self.__get_data(url, params=params)
+            data = self._get_data(url, params=params)
             all_data.extend(data["results"])
             print(
                 f"Fetched {len(data['results'])} records. Total so far: {len(all_data)}/{total_length} ({round(len(all_data) / total_length * 100, 2)}%)"

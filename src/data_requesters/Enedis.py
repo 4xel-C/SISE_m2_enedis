@@ -2,10 +2,10 @@ from typing import Any
 
 import requests
 
-from src.data_requesters.helper import retry_on_error
+from src.data_requesters.base_api import BaseAPIRequester
 
 
-class Enedis_API_requester:
+class Enedis_API_requester(BaseAPIRequester):
     """
     A class to interact with the Enedis API.
     """
@@ -20,20 +20,6 @@ class Enedis_API_requester:
         """
         self.__params: dict[str, int] = {"limit": limit}
         self.__all_iris_codes: list[str] = []
-
-    @retry_on_error()
-    def __get_data(self, params: dict[str, Any] | None = None) -> dict | None:
-        """Private method to get data from the Enedis API.
-
-        Args:
-            params (dict[str, Any] | None, optional): The parameters for the API request. Defaults to None.
-
-        Returns:
-            dict | None: The JSON response from the API or None if an error occurred.
-        """
-        response = requests.get(self.__base_url, params=params)
-        response.raise_for_status()  # Raise an error for bad responses.
-        return response.json()
 
     def __get_length(self, params: dict[str, Any] | None = None) -> int:
         """Private method to get the total number of results from the API for monitoring progress.

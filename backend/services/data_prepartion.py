@@ -15,7 +15,7 @@ def prepare_data(input_data: InputData) -> pd.DataFrame | None:
         pd.DataFrame: The prepared input data for the ML model.
     """
     # Get the geographical features
-    geo_info = geo_api.get_zone_and_altitude(ville=input_data.city)
+    geo_info = geo_api.get_city_info(ville=input_data.city)
 
     if not geo_info:
         return None

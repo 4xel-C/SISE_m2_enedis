@@ -2,15 +2,14 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-import requests
 
-from src.data_requesters.helper import retry_on_error
+from src.data_requesters.base_api import BaseAPIRequester
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 CLIMATE_ZONES_PATH = BASE_DIR / "data" / "climate_zones.csv"
 
 
-class Geo_API_requester:
+class Geo_API_requester(BaseAPIRequester):
     """
     A class to interact with the Geo API from datagouv to get geographical features from cities names or INSEE codes.
     """
@@ -27,23 +26,6 @@ class Geo_API_requester:
         self.climate_zones = pd.Series(
             df_zones["Zone climatique"].values, index=df_zones["Departement"]
         ).to_dict()
-
-    @retry_on_error()
-    def __get_data(self, url, params: dict[str, Any] | None = None) -> dict | None:
-        """Private method to get data from API.
-
-        Args:
-            params (dict[str, Any] | None, optional): The parameters for the API request. Defaults to None.
-
-        Returns:
-            dict | None: The JSON response from the API or None if an error occurred.
-        """
-        response = requests.get(url, params=params)
-        if response.status_code == 404:
-            return None
-
-        response.raise_for_status()  # Raise an error for bad responses other than 404.
-        return response.json()
 
     def __extract_department_from_feature(self, props: dict) -> str | None:
         """
@@ -100,7 +82,7 @@ class Geo_API_requester:
             result["dept"] = dept_from_insee
 
             # Get the data from the API.
-            data = self.__get_data(f"{self.__url_insee}{ville}")
+            data = self._get_data(f"{self.__url_insee}{ville}")
 
             # Get the city name.
             if data:
@@ -111,12 +93,12 @@ class Geo_API_requester:
                 # Return None if the INSEE code is invalid.
                 return None
 
-        # When we have the city name, call the city search endpoint.
+        # When we have the city name, call the city search endpoint, update the result dictionnary.
 
         # Build the parameters
         params = {"q": ville, "limit": 1}
 
-        data = self.__get_data(self.__url_cities, params=params)
+        data = self._get_data(self.__url_cities, params=params)
 
         if data:
             features = data.get("features", [])
@@ -139,6 +121,7 @@ class Geo_API_requester:
                 result["_context"] = props.get("context")
                 result["_postcode"] = props.get("postcode")
                 result["_citycode"] = props.get("citycode")
+                result["city"] = props.get("city")
 
         # Return None if we couldn't extract a department code.
         if result.get("dept") is None:
@@ -151,4 +134,6 @@ class Geo_API_requester:
         result["zone_climatique"] = self.climate_zones.get(
             result["dept"], "H1"
         )  # Use the most common zone as default
+
+        print(result)
         return result

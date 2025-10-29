@@ -74,7 +74,7 @@ if data_files:
             st.caption(f"🧮 All {len(data):,} homes are displayed.")
 
         # Pydeck map
-        os.environ["MAPBOX_API_KEY"] = st.secrets["MAPBOX_API_KEY"]
+        # os.environ["MAPBOX_API_KEY"] = st.secrets["MAPBOX_API_KEY"]
 
         view_state = pdk.ViewState(
             latitude=data_map["lat"].mean(),

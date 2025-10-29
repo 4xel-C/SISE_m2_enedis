@@ -1,11 +1,11 @@
 import pandas as pd
 
 from backend.models.input_model import InputData
+from src.data_requesters import geo_api
 from src.data_requesters.elevation import Elevation_API_requester
-from src.data_requesters.geo_features import get_zone_and_altitude
 
 
-def prepare_data(input_data: InputData) -> pd.DataFrame:
+def prepare_data(input_data: InputData) -> pd.DataFrame | None:
     """Function to prepare data from the user input in order to feed the ML model.
 
     Args:
@@ -15,7 +15,11 @@ def prepare_data(input_data: InputData) -> pd.DataFrame:
         pd.DataFrame: The prepared input data for the ML model.
     """
     # Get the geographical features
-    geo_info = get_zone_and_altitude(ville=input_data.city)
+    geo_info = geo_api.get_zone_and_altitude(ville=input_data.city)
+
+    if not geo_info:
+        return None
+
     zone_clim = geo_info.get("zone_climatique")
     lat, lon = geo_info.get("lat"), geo_info.get("lon")
 

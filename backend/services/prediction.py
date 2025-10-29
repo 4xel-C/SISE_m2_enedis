@@ -21,6 +21,13 @@ def predict_classification(features: InputData) -> dict:
     # ---- Prepare data
     X_input = prepare_data(features)
 
+    # If we couldn't retrive geographical features, return an error.
+    if X_input is None:
+        raise HTTPException(
+            status_code=400,
+            detail="❌ Unable to retrieve geographical features for the provided city/INSEE code.",
+        )
+
     # load the pipeline and the model
     pipeline_model = load_pipeline()
     label_encoder = load_label_encoder()

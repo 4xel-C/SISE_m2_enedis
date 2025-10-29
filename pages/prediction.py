@@ -4,8 +4,8 @@ import joblib
 import pandas as pd
 import streamlit as st
 
+from src.data_requesters import geo_api
 from src.data_requesters.elevation import Elevation_API_requester
-from src.data_requesters.geo_features import get_zone_and_altitude
 
 # Page configuration
 st.set_page_config(page_title="DPE Prediction", page_icon="🔮", layout="centered")
@@ -88,9 +88,12 @@ if submitted:
 
     # ---- Step 1: Retrieve zone & coordinates
     with st.spinner(f"📡 Retrieving climate zone for {city}..."):
-        geo_info = get_zone_and_altitude(ville=city)
-        zone_clim = geo_info.get("zone_climatique")
-        lat, lon = geo_info.get("lat"), geo_info.get("lon")
+        geo_info = geo_api.get_city_info(ville=city)
+        zone_clim = geo_info.get("zone_climatique") if geo_info else None
+        lat, lon = (
+            geo_info.get("lat") if geo_info else None,
+            geo_info.get("lon") if geo_info else None,
+        )
 
     if not lat or not lon:
         st.warning("⚠️ Could not retrieve coordinates for this city.")
@@ -104,8 +107,8 @@ if submitted:
     # ---- Display fetched info
     st.markdown("### 🌦️ Automatically detected information")
     st.info(
-        f"- **City:** {city}  \n"
-        f"- **Latitude / Longitude:** {lat:.4f}, {lon:.4f}  \n"
+        f"- **City:** {geo_info['city'] if geo_info else 'Unknown'}  \n"
+        f"- **Latitude / Longitude:** {lat}, {lon}  \n"
         f"- **Climate zone:** {zone_clim or 'Unknown'}  \n"
         f"- **Average altitude:** {altitude_moyenne:.1f} m"
     )

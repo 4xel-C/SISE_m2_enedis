@@ -1,8 +1,9 @@
 from typing import Any, Callable, Optional
 
+import requests
+
 from data_requesters.helper import retry_on_error
 from src.data_requesters.base_api import BaseAPIRequester
-import requests
 
 
 class Ademe_API_requester(BaseAPIRequester):

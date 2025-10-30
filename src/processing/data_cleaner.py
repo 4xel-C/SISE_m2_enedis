@@ -65,6 +65,8 @@ class DataCleaner:
             "_geopoint",
             "type_energie_principale_chauffage",
             "age_batiment",
+            "date_reception_dpe",
+            "numero_dpe",
         ]
 
         self.df = self.df[relevant_columns]

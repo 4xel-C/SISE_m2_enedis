@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from src.data_requesters import Ademe_API_requester
+from src.data_requesters import Ademe_API_requester, api_ademe
 from src.processing.data_cleaner import DataCleaner
 from src.utils.dataloader import generate_file_selector
 
@@ -51,6 +51,7 @@ with tab1:
             st.info("⬆️ Please select a dataset to get started.")
 
         else:
+            st.write("Number of rows in the dataset:", len(data))
             st.write(data.head(5))
 
             # Action butons
@@ -71,10 +72,90 @@ with tab1:
                 if st.button("🔄 Refresh and complete current dataset"):
                     file_path = DATASETS_DIR / st.session_state.last_file
 
-                    st.info("To be implemented.")
+                    # List to get the new data from the both API endpoints
+                    new_data = list()
 
-                st.warning("⚠️ Completing the data could take a lot of time.")
-                pass
+                    # Get the latest DPE date by converting to datetime
+                    latest_dpe_date = pd.to_datetime(
+                        data["date_reception_dpe"], errors="coerce"
+                    ).max()
+
+                    # Get the string representation of the date.
+                    latest_dpe_date = latest_dpe_date.strftime("%Y-%m-%d")
+
+                    # Get the partment code from the dataset
+                    departement = str(data["code_departement_ban"].iloc[0]).zfill(2)
+
+                    with st.spinner("Fetching new data from both ADEME API..."):
+                        loading_text = st.empty()
+                        try:
+                            loading_text.text("Fetching data on old buildings...")
+                            progress_bar = st.progress(0.0)
+                            status_text = st.empty()
+
+                            # === Load Data ===
+                            def progress_cb_old(current: int, total: int) -> None:
+                                frac = (current / total) if total else 0.0
+                                progress_bar.progress(min(1.0, frac))
+                                status_text.text(f"Retrieved {current:,} / {total:,}")
+
+                            # Query the API for the new data since the latest DPE date
+                            new_data.extend(
+                                api_ademe.custom_lines_request(
+                                    neuf=False,
+                                    progress_callback=progress_cb_old,
+                                    qs=f"date_reception_dpe:[{latest_dpe_date} TO *] AND code_departement_ban:{departement}",
+                                ),
+                            )
+
+                            loading_text.text("Fetching data on new buildings...")
+
+                            # Query the API for new housing data since the latest DPE date
+                            new_data.extend(
+                                api_ademe.custom_lines_request(
+                                    neuf=True,
+                                    qs=f"date_reception_dpe:[{latest_dpe_date} TO *] AND code_departement_ban:{departement}",
+                                )
+                            )
+
+                            loading_text.empty()
+                        except Exception as e:
+                            loading_text.empty()
+                            st.error(f"❌ Error while fetching data: {e}")
+                            new_data = []
+
+                        # Generate a Dataframe from the new data and clean it
+                        if new_data:
+                            new_df = pd.DataFrame(new_data)
+                            cleaner = DataCleaner(new_df)
+                            new_df = cleaner.clean_all()
+
+                            # Concatenate the new data to the existing one
+                            combined_df = pd.concat(
+                                [data, new_df], ignore_index=True
+                            ).drop_duplicates()
+
+                            # free the memory
+                            del cleaner
+                            del new_df
+                            st.session_state.df = None
+
+                            # Save the updated data to the CSV file
+                            combined_df.to_csv(file_path, index=False)
+
+                            # Update the session state
+                            st.session_state.df = combined_df
+                            data = st.session_state.df
+
+                            # Keep track of the update
+                            st.session_state.has_updated = True
+
+                            # Rerun the page
+                            st.rerun()
+
+                if st.session_state.get("has_updated", False):
+                    st.success("✅ Dataset updated successfully.")
+                    st.session_state.has_updated = False
 
             with col3:
                 # Button to delete the current dataset

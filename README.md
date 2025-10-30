@@ -1,87 +1,124 @@
-# ml-enedis
-Application permettant l'évaluation du DPE et de la consommation énergétique d'un logement.
+# ⚡ ml-enedis: Master SISE Project
+![Python version](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
+![Streamlit version](https://img.shields.io/badge/Streamlit-1.25-orange?logo=streamlit&logoColor=white)
 
-## Démo
+## 🧠 Introduction
+This repository hosts a complete **web application** that provides an interface for **data analysis**, **dataset management**, and **prediction** using **pretrained machine learning models**. The application predicts:
 
-<u>TODO</u>
+-  **Total annual energy cost** of a house or apartment  
+- ⚡ **DPE classification** (Energy Performance Diagnosis)
 
-## Installation
+The **DPE classification** is a 7-level label ranging from **A** (most energy efficient) to **G** (least efficient). It is a crucial criterion when selling or renting properties, with regulatory restrictions for low-performing buildings. Our goal is to predict this classification using easily accessible input data through a simple web form, avoiding the need for detailed technical measurements.
 
-Pour installer ce projet, suivez les étapes ci-dessous :
+Since the DPE label is closely linked to total energy costs, the project also includes a **regression model** to predict the annual energy expenditure. Together, these form a **two-model prediction pipeline**.
 
-1. **Cloner le dépôt** :
-```sh
+All the preliminary data explorations, models testing and devlopment are findable in the following repository: [📊 Data exploration and models building](https://github.com/4xel-C/SISE_Enedis_ML_Study)
+
+This project was developed by **four Master SISE students** and concludes the Python and Machine Learning lessons of the program.
+
+---
+
+## ⚙️ Installation
+
+### 1️⃣ Clone the repository
+```bash
 git clone https://github.com/cyrizon/ml-enedis.git
+cd ml-enedis
 ```
 
-2. **Installer les dépendances** :
+### 2️⃣ Install dependencies
+**Prerequisite:** Python 3.13 installed.
 
-**Pré-requis :** Python 3.13 installé.
-
-- *Avec le gestionnaire de package UV :*
-```sh
+- **Using UV package manager**
+```bash
 uv sync
 ```
 
-- *Sans UV :*
-```sh
+- **Without UV**
+```bash
 pip install -r requirements.txt
 ```
 
-3. **Lancer l'application**:
+---
 
-<u>TODO</u>
-pour l'instant il faut écrire cette commande dans un terminal python
+## 🚀 Usage
 
-- *Avec le gestionnaire de package UV :*
-```sh
-uv run streamlit run home.py
+1. Run the web app locally:
+```bash
+streamlit run Home.py
 ```
+2. Open your browser to interact with the app.  
+3. Go to the prediction menu, fill in the form with your property’s details to get predictions for:  
+   - 🏠 Total annual energy cost  
+   - ⚡ DPE classification
+---
 
-- *Sans UV :*
-```sh
-streamlit run home.py
-```
+## 📊 Features
+- 🏠 Predict DPE labels (A–G)  
+- 💰 Predict total annual energy cost  
+- 📈 Interactive web interface with dashboard and map
+- 🔍 Data exploration and visualization built-in
+- 🛜 Download and update datasets
 
-## Project structure
-```
-mon_projet/
-│
-├── home.py                                          # Main streamlit app launcher.
-├── requirements.txt
-├── README.md
-├── pyproject.toml
-├── uv.lock
-├── .python-version
-│
-├── .streamlit       # À créer
-│   └── secrets.toml # Fichier contenant votre clé API publique MapBox : MAPBOX_API_KEY= "..."
-│                    # Utilisé pour des arrières plan de carte
-│
-├── pages/                                          # Pages from streamlit.
-│   ├── data.py
-│   ├── prediction.py
-│   └── api_requests.py
-│
-├── src/                                            # Main code.
-│   ├── data_requesters                             # Requesters for data on external APIs.
-│   │   ├── ademe.py                                
-│   │   ├── elevation.py                            
-│   │   ├── enedis.py
-│   │   ├── geo_features.py
-│   │   └── helper.py
-│   └── api.py/                                     # FastAPI routes for the application.
-│       └── main.py                                 # main FastAPI file to run the back-end API routes.
-│
-├── MLmodels/                                       # trained ml models.
-│   ├── pipeline_xgboost_classification.pkl         # Classification model.
-│   ├── label_encoder_target.pkl                    # Label encoder for target.
-|   └── features_target_columns.pkl                 # Features infos.
-|
-├── assets/                                         # assets for streamlit app.
-├── data/                                           # data storage (will contains a sample for test).
-└── notebooks/                                      # ipython noteboks for exploration.                     
-```
+---
 
-## Links
-- [📊 Data exploration and models building](https://github.com/4xel-C/SISE_Enedis_ML_Study): Data exploration have been separated in another repository to avoid overloading main application from model preparations and explorations.
+## 🛠 Tech Stack
+This project leverages the following technologies and libraries:
+
+- **Python** – Core programming language for the application.
+- **Streamlit** – Web application framework for interactive UI.
+- **FastAPI** – Backend API framework for handling requests and predictions.
+- **Pydantic** – Data validation and schema definition for API inputs.
+- **Pandas** – Data manipulation and preprocessing.
+- **Scikit-learn** – Machine learning models, pipelines, and preprocessing.
+- **Plotly** – Interactive visualizations and dynamic plots.
+
+---
+
+## 🗂 Project Structure
+```
+ml-enedis/
+├─ home.py                   # Streamlit app launcher
+├─ pages/                    # Streamlit multi-page interface
+│  ├─ data.py
+│  ├─ context.py
+│  ├─ datasets.py
+│  ├─ map.py
+│  └─ prediction.py
+├─ assets/                   # Images and icons for app
+├─ MLModels/                 # Pretrained machine learning models and encoders
+│  ├─ features_target_columns_classification.pkl
+│  ├─ features_target_columns_regression.pkl
+│  ├─ label_encoder_target.pkl
+│  ├─ pipeline_best_regression.pkl
+│  └─ pipeline_sgboost_classification.pkl
+├─ data/                     # Raw and processed data
+│  ├─ climate_zones.csv
+│  ├─ communes-france-2025.csv
+│  └─ datasets/              # Specific datasets
+│     └─ data_69.csv
+├─ doc/                      # Documentation
+│  ├─ DOC_FONCTIONNELLE.md
+│  ├─ DOC_TECHNIQUE.md
+│  └─ RAPPORT.md
+├─ backend/                  # FastAPI backend
+│  ├─ main.py                # API launcher
+│  ├─ models/                # Pydantic input validation models
+│  │  └─ input_model.py
+│  └─ services/              # Backend services for data prep and predictions
+│     ├─ data_preparation.py
+│     └─ prediction.py
+└─ src/                      # Supporting Python modules
+   ├─ data_requesters/      # Data fetching modules
+   │  ├─ ademe.py
+   │  ├─ base_api.py        # ABC class for API requests
+   │  ├─ elevation.py
+   │  ├─ enedis.py
+   │  ├─ geo_features.py
+   │  └─ helper.py
+   ├─ processing/           # Data processing modules
+   │  └─ data_cleaner.py
+   └─ utils/                # Utilities for loading and selecting files
+      ├─ dataloader.py
+      └─ file_selector.py    # Streamlit file selector               
+```

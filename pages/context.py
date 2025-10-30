@@ -2,17 +2,18 @@
 # Context Page - Data Presentation and Visualization
 """
 
-import streamlit as st
-import pandas as pd
-import plotly.express as px
 import os
 import sys
+
+import pandas as pd
+import plotly.express as px
+import streamlit as st
 
 # Add parent path to import local modules
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from src.data_requesters.enedis import Enedis_API_requester
 from src.data_requesters.ademe import Ademe_API_requester
+from src.data_requesters.enedis import Enedis_API_requester
 
 # Plotly configuration
 config = {"width": "stretch"}

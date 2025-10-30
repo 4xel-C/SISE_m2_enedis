@@ -1,10 +1,12 @@
+import datetime
+
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import pydeck as pdk
 import streamlit as st
 from streamlit_dynamic_filters import DynamicFilters
-import plotly.express as px
-import plotly.graph_objects as go
-import datetime
+
 from src.data_requesters import Ademe_API_requester
 from src.processing.data_cleaner import DataCleaner
 
@@ -87,11 +89,6 @@ if "data_api" not in st.session_state:
 if fetch_api:
     data_api = load_api(neuf, limit, departement, size)
     if not data_api.empty:
-        # have to add construction year if new building because API does not provide it
-        if neuf and "annee_construction" not in data_api.columns:
-            current_year = datetime.datetime.now().year
-            data_api["annee_construction"] = current_year
-
         cleaner_api = DataCleaner(data_api)
         data_api = cleaner_api.clean_all()
         st.session_state.data_api = data_api
@@ -273,7 +270,7 @@ if data is not None:
                 map_style="mapbox://styles/mapbox/satellite-streets-v12",
                 initial_view_state=view_state,
                 layers=[layer],
-                tooltip=tooltip,
+                tooltip=tooltip,  # type: ignore
             )
 
             st.pydeck_chart(deck, use_container_width=True)

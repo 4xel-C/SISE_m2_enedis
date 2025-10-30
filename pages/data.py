@@ -1,17 +1,67 @@
+import datetime
+from pathlib import Path
+
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import pydeck as pdk
 import streamlit as st
 from streamlit_dynamic_filters import DynamicFilters
-import plotly.express as px
-import plotly.graph_objects as go
-import datetime
+
 from src.data_requesters import Ademe_API_requester
 from src.processing.data_cleaner import DataCleaner
+
+# === Path to CSV Files ===
+DATASETS_DIR = Path(__file__).parent.parent / "data" / "datasets"
+
 
 # General configuration
 st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layout="wide")
 
 st.title("🗺️ Map and 📊 Statistics of the DPE Dataset")
+
+# === Side bar files selection ===
+
+csv_files = [f.name for f in DATASETS_DIR.glob("*.csv")]
+
+
+@st.cache_data
+def load_default_csv(path: Path) -> pd.DataFrame:
+    """Function to cache loaded dataset.
+
+    Args:
+        path (Path): Path to the CSV file.
+
+    Returns:
+        pd.DataFrame: Loaded DataFrame.
+    """
+    return pd.read_csv(path)
+
+
+# Check session state for last file if exists
+if "last_file" in st.session_state and st.session_state.last_file in csv_files:
+    default_index = csv_files.index(st.session_state.last_file)
+else:
+    default_index = 0
+    st.sidebar.info("ℹ️ Select a dataset from the dropdown.")
+
+selected_file = st.sidebar.selectbox(
+    "**Select your dataset:**", csv_files, index=default_index
+)
+
+# Load the file if not already in session state.
+if selected_file and st.session_state.get("file") != selected_file:
+    file_path = DATASETS_DIR / selected_file
+
+    if "df" not in st.session_state:
+        # Temporary placeholder for spinner
+        placeholder = st.sidebar.empty()
+
+        # Saving dataframe and file name in session state.
+        with st.spinner(f"⏳ Loading of `{selected_file}`..."):
+            st.session_state.df = load_default_csv(file_path)
+            st.session_state.last_file = selected_file
+
 
 # === Data upload ===
 col1, col2 = st.columns(2)
@@ -88,9 +138,9 @@ if fetch_api:
     data_api = load_api(neuf, limit, departement, size)
     if not data_api.empty:
         # have to add construction year if new building because API does not provide it
-        if neuf and "annee_construction" not in data_api.columns:
-            current_year = datetime.datetime.now().year
-            data_api["annee_construction"] = current_year
+        # if neuf and "annee_construction" not in data_api.columns:
+        #     current_year = datetime.datetime.now().year
+        #     data_api["annee_construction"] = current_year
 
         cleaner_api = DataCleaner(data_api)
         data_api = cleaner_api.clean_all()
@@ -273,7 +323,7 @@ if data is not None:
                 map_style="mapbox://styles/mapbox/satellite-streets-v12",
                 initial_view_state=view_state,
                 layers=[layer],
-                tooltip=tooltip,
+                tooltip=tooltip,  # type: ignore[arg-type]. False positive mypy.
             )
 
             st.pydeck_chart(deck, use_container_width=True)

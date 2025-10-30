@@ -72,8 +72,12 @@ class DataCleaner:
     def add_construction_year(self) -> pd.DataFrame:
         """Add a new column "annee_construction" if missing (from the new housing dataset), filled with the current year."""
 
+        # If the column is missing, add it with the current year.
         if "annee_construction" not in self.df.columns:
             self.df["annee_construction"] = dt.datetime.now().year
+
+        # Add the age of the building.
+        self.df["age_batiment"] = dt.datetime.now().year - self.df["annee_construction"]
 
         return self.df
 
@@ -212,8 +216,8 @@ class DataCleaner:
 
     def clean_all(self) -> pd.DataFrame:
         """Run all cleaning methods in sequence."""
-        self.select_relevant_variables()
         self.add_construction_year()
+        self.select_relevant_variables()
         self.cost_cleaning()
         self.energie_type_cleaning()
         self.surface_cleaning()

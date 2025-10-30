@@ -78,26 +78,28 @@ if data is not None:
         # Mean surface habitable
         surface_moyenne = filtered_df["surface_habitable_logement"].mean()
         col1.metric(
-            label="Moyenne Surface Habitable",
-            value=f"{round(surface_moyenne, 2)}m²",
+            label="Average living area",
+            value=f"{round(surface_moyenne, 2)} m²",
             border=True,
         )
-        # Mean consommation énergie
+        # Mean consumption
         consommation_moyenne = filtered_df["cout_total_5_usages"].mean()
         col2.metric(
-            label="Consommation Moyenne (kWh/an)",
-            value=f"{round(consommation_moyenne, 2)} kWh",
+            label="Average consumption (kWep/year)",
+            value=f"{round(consommation_moyenne, 2)}",
             border=True,
         )
-        # Mean cout
+        # Mean cost
         cout_moyen = filtered_df["cout_total_5_usages"].mean()
         col3.metric(
-            label="Coût moyen (€/an)", value=f"{round(cout_moyen, 2)}€", border=True
+            label="Average cost (€/year)",
+            value=f"{round(cout_moyen, 2)} €",
+            border=True,
         )
         # Most frequent DPE class
         most_common_dpe = filtered_df["etiquette_dpe"].mode()[0]
         col4.metric(
-            label="Etiquette DPE plus fréquente (replace with icon)",
+            label="Most frequent DPE label (replace with icon)",
             value=most_common_dpe,
             border=True,
         )
@@ -116,12 +118,12 @@ if data is not None:
             with st.container():
                 summary_df = pd.DataFrame(
                     {
-                        "Conso Énergétique (kWep)": conso_stats,
-                        "Emission Ges (kgCO₂/an)": ges_stat,
-                        "Coût (€)": cout_stats,
+                        "Energy consumption (kWep)": conso_stats,
+                        "GES emissions (kgCO₂/year)": ges_stat,
+                        "Cost (€)": cout_stats,
                     }
                 ).round(2)
-                st.markdown("**Statistiques**")
+                st.markdown("**Statistics**")
                 st.dataframe(
                     summary_df.style.set_table_styles(
                         [{"selector": "td, th", "props": [("font-size", "12px")]}]
@@ -165,9 +167,9 @@ if data is not None:
             )
 
             fig_col.update_layout(
-                title="Répartition des classes DPE",
+                title="Distribution of DPE classes",
                 xaxis_title="",
-                yaxis_title="Classe DPE",
+                yaxis_title="DPE class",
             )
             fig_col.update_yaxes(autorange="reversed")
 
@@ -212,18 +214,18 @@ if data is not None:
             )
 
             fig_ges.update_layout(
-                title="Répartition des classes GES",
+                title="Distribution of GES classes",
                 xaxis_title="",
-                yaxis_title="Classe GES",
+                yaxis_title="GES class",
             )
             fig_ges.update_yaxes(autorange="reversed")
 
             st.plotly_chart(fig_ges, config=config)
 
-        # Energy consumption and cost per class DPE
+        # Energy consumption and cost by DPE class
         col1, col2 = st.columns(2)
 
-        # Consommation énergie par classe DPE
+        # Energy consumption by DPE class
         with col1:
             fig_box = px.box(
                 filtered_df,
@@ -231,11 +233,11 @@ if data is not None:
                 y="conso_5_usages_ef",
                 category_orders={"etiquette_dpe": ["A", "B", "C", "D", "E", "F", "G"]},
                 points=False,
-                title="Consommation énergie par classe DPE",
+                title="Energy consumption by DPE class",
             )
             st.plotly_chart(fig_box, config=config)
 
-        # Coût moyen par classe DPE
+        # Average cost by DPE class
         with col2:
             fig = px.histogram(
                 filtered_df,
@@ -243,10 +245,10 @@ if data is not None:
                 y="cout_total_5_usages",
                 category_orders={"etiquette_dpe": ["A", "B", "C", "D", "E", "F", "G"]},
                 histfunc="avg",
-                title="Coût moyen par classe DPE",
+                title="Average cost by DPE class",
                 labels={
-                    "etiquette_dpe": "Classe DPE",
-                    "cout_total_5_usages": "Coût(€)",
+                    "etiquette_dpe": "DPE class",
+                    "cout_total_5_usages": "Cost (€)",
                 },
                 text_auto=True,
             )
@@ -256,10 +258,10 @@ if data is not None:
 
         st.divider()
         # ------------------------------------------------------------------------------------------
-        # Consommation d'énergie par Type d'Usage
-        st.subheader("Consommation d'énergie par Type d'Usage")
+        # Energy consumption by use type
+        st.subheader("Energy consumption by use type")
         usage_map = {
-            "Chauffage": {
+            "Heating": {
                 "conso": "conso_chauffage_ef",
                 "cout": "cout_chauffage",
                 "ges": "emission_ges_chauffage",
@@ -269,17 +271,17 @@ if data is not None:
                 "cout": "cout_ecs",
                 "ges": "emission_ges_ecs",
             },
-            "Refroidissement": {
+            "Cooling": {
                 "conso": "conso_refroidissement_ef",
                 "cout": "cout_refroidissement",
                 "ges": "emission_ges_refroidissement",
             },
-            "Eclairage": {
+            "Lighting": {
                 "conso": "conso_eclairage_ef",
                 "cout": "cout_eclairage",
                 "ges": "emission_ges_eclairage",
             },
-            "Auxiliaires": {
+            "Auxiliaries": {
                 "conso": "conso_auxiliaires_ef",
                 "cout": "cout_auxiliaires",
                 "ges": "emission_ges_auxiliaires",
@@ -287,8 +289,8 @@ if data is not None:
         }
 
         # Radio button filter
-        usages = ["Chauffage", "ECS", "Refroidissement", "Eclairage", "Auxiliaires"]
-        selected_usage = st.radio("Choisir le type de consommation", usages)
+        usages = list(usage_map.keys())
+        selected_usage = st.radio("Choose consumption type", usages)
 
         # Get the correct columns
         conso_col = usage_map[selected_usage]["conso"]
@@ -296,36 +298,36 @@ if data is not None:
         ges_col = usage_map[selected_usage]["ges"]
 
         col1, col2, col3 = st.columns([0.5, 0.25, 0.25])
-        # satistics table
+        # statistics table
         with col1:
             summary_df = pd.DataFrame(
                 {
-                    "Consommation (kWep/an)": [
+                    "Energy consumption (kWep/year)": [
                         filtered_df[conso_col].mean(),
                         filtered_df[conso_col].std(),
                         filtered_df[conso_col].min(),
                         filtered_df[conso_col].max(),
                     ],
-                    "Émission GES (kgCO₂/an)": [
+                    "GES emissions (kgCO₂/year)": [
                         filtered_df[ges_col].mean(),
                         filtered_df[ges_col].std(),
                         filtered_df[ges_col].min(),
                         filtered_df[ges_col].max(),
                     ],
-                    "Coût (€)": [
+                    "Cost (€)": [
                         filtered_df[cout_col].mean(),
                         filtered_df[cout_col].std(),
                         filtered_df[cout_col].min(),
                         filtered_df[cout_col].max(),
                     ],
                 },
-                index=["Moyenne", "Écart-type", "Min", "Max"],
+                index=["Average", "Std dev", "Min", "Max"],
             ).round(2)
 
-            st.write(f"Consommation d'énergie : {selected_usage}")
+            st.write(f"Energy consumption: {selected_usage}")
             st.dataframe(summary_df)
 
-        # Gauge Conso
+        # Gauge consumption
         with col2:
             total_conso_sum = filtered_df["conso_5_usages_ef"].sum()
             usage_sum = filtered_df[conso_col].sum()
@@ -338,7 +340,7 @@ if data is not None:
                     value=prop,
                     number={"suffix": "%"},
                     title={
-                        "text": f"Contribution de {selected_usage} <br> à la consommation énergétique",
+                        "text": f"Contribution of {selected_usage} <br> to energy consumption",
                         "font": {"size": 14},
                     },
                     gauge={
@@ -350,31 +352,28 @@ if data is not None:
 
             # Adjust size
             fig.update_layout(
-                height=250,  # smaller height
-                width=250,  # optional: smaller width
-                margin={"t": 60, "b": 20, "l": 20, "r": 20},  # reduce extra space
+                height=250,
+                width=250,
+                margin={"t": 60, "b": 20, "l": 20, "r": 20},
             )
 
             st.plotly_chart(fig, config=config)
 
-        # Gauge émission GES
+        # Gauge GES emissions
         with col3:
             total_ges_sum = filtered_df["emission_ges_5_usages"].sum()
 
-            # Somme de l'usage sélectionné (chauffage, ecs, etc.)
             usage_ges_sum = filtered_df[ges_col].sum()
 
-            # Calcul du pourcentage
             prop_ges = usage_ges_sum / total_ges_sum * 100
 
-            # Simple gauge pour les émissions GES
             fig_ges = go.Figure(
                 go.Indicator(
                     mode="gauge+number",
                     value=prop_ges,
                     number={"suffix": "%"},
                     title={
-                        "text": f"Contribution de {selected_usage} <br> aux émissions GES",
+                        "text": f"Contribution of {selected_usage} <br> to GES emissions",
                         "font": {"size": 14},
                     },
                     gauge={
@@ -384,11 +383,10 @@ if data is not None:
                 )
             )
 
-            # Adjust size
             fig_ges.update_layout(
-                height=250,  # smaller height
-                width=250,  # optional: smaller width
-                margin={"t": 60, "b": 20, "l": 20, "r": 20},  # reduce extra space
+                height=250,
+                width=250,
+                margin={"t": 60, "b": 20, "l": 20, "r": 20},
             )
 
             st.plotly_chart(fig_ges, config=config)
@@ -397,12 +395,12 @@ if data is not None:
 
         # ------------------------------------------------------------------------------------------
         # SCATTER PLOT
-        st.subheader("Impact des variables sur la consommation énergétique")
+        st.subheader("Impact of variables on energy consumption")
         col1, col2 = st.columns([0.3, 0.7])
         with col1:
             numeric_cols = filtered_df.select_dtypes(include="number").columns.tolist()
             option = st.selectbox(
-                "Choix du variable Y",
+                "Choose Y variable",
                 numeric_cols,
             )
             st.write("Y = ", option)
@@ -413,10 +411,10 @@ if data is not None:
                 x="conso_5_usages_ef",  # X is fixed as total consumption
                 y=option,
                 labels={
-                    "conso_5_usages_ef": "Consommation Totale (kWep/m²/an)",
+                    "conso_5_usages_ef": "Total consumption (kWep/m²/year)",
                     option: option,
                 },
-                title=f"Relation entre Consommation énergétique et {option} (Corrélation = {corr_value:.2f})",
+                title=f"Relationship between energy consumption and {option} (Correlation = {corr_value:.2f})",
             )
 
             st.plotly_chart(fig, config=config)

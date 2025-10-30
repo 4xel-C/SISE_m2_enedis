@@ -245,20 +245,20 @@ class Ademe_API_requester(BaseAPIRequester):
         """
         # Get the appropriate base URL
         url = self.__base_url_neuf if neuf else self.__base_url_existant
-        
+
         response = requests.get(url)
         response.raise_for_status()
         dataset_info = response.json()
-        
+
         schema = dataset_info.get("schema", [])
-        
+
         return [
             {
                 "key": field.get("key"),
                 "label": field.get("label") or field.get("title") or field.get("key"),
                 "type": field.get("type"),
                 "description": field.get("description") or "",
-                "x-group": field.get("x-group") or "Non classé"
+                "x-group": field.get("x-group") or "Non classé",
             }
             for field in schema
         ]
@@ -281,7 +281,9 @@ class Ademe_API_requester(BaseAPIRequester):
         fields = self.get_dataset_fields(neuf=neuf)
         return [field["key"] for field in fields]
 
-    def get_fields_by_group(self, neuf: bool = False) -> dict[str, list[dict[str, Any]]]:
+    def get_fields_by_group(
+        self, neuf: bool = False
+    ) -> dict[str, list[dict[str, Any]]]:
         """Get fields organized by their group category.
 
         Args:
@@ -298,13 +300,13 @@ class Ademe_API_requester(BaseAPIRequester):
         """
         fields = self.get_dataset_fields(neuf=neuf)
         groups: dict[str, list[dict[str, Any]]] = {}
-        
+
         for field in fields:
             group = field.get("x-group", "Non classé")
             if group not in groups:
                 groups[group] = []
             groups[group].append(field)
-        
+
         return groups
 
     def print_available_fields(self, neuf: bool = False) -> None:
@@ -319,21 +321,23 @@ class Ademe_API_requester(BaseAPIRequester):
         """
         fields_by_group = self.get_fields_by_group(neuf=neuf)
         dataset_type = "Logements neufs" if neuf else "Logements existants"
-        
+
         print(f"\n{'='*80}")
         print(f"Available fields in ADEME API - {dataset_type}")
-        print(f"Total: {sum(len(fields) for fields in fields_by_group.values())} fields")
+        print(
+            f"Total: {sum(len(fields) for fields in fields_by_group.values())} fields"
+        )
         print(f"{'='*80}\n")
-        
+
         for group, fields in sorted(fields_by_group.items()):
             print(f"\n{'─'*80}")
             print(f"📁 Groupe: {group} ({len(fields)} champs)")
             print(f"{'─'*80}")
-            
+
             for i, field in enumerate(fields, 1):
                 print(f"{i}. {field['key']}")
                 print(f"   Label: {field['label']}")
                 print(f"   Type: {field['type']}")
-                if field['description']:
+                if field["description"]:
                     print(f"   Description: {field['description']}")
                 print()

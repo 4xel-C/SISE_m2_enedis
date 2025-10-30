@@ -5,7 +5,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import os
 import sys
 
@@ -16,9 +15,7 @@ from src.data_requesters.enedis import Enedis_API_requester
 from src.data_requesters.ademe import Ademe_API_requester
 
 # ⚙️ General configuration
-st.set_page_config(
-    page_title="DPE - Data Context", page_icon="📋", layout="wide"
-)
+st.set_page_config(page_title="DPE - Data Context", page_icon="📋", layout="wide")
 
 # 📋 Title
 st.title("📋 Context - Overview of Available Data")
@@ -39,7 +36,7 @@ with col1:
     st.metric(
         label="🏛️ ADEME - DPE",
         value="Main source",
-        help="Database of energy performance certificates"
+        help="Database of energy performance certificates",
     )
     st.caption("Energy data for French housing")
 
@@ -47,7 +44,7 @@ with col2:
     st.metric(
         label="⚡ Enedis",
         value="Complementary data",
-        help="Electricity consumption by territory"
+        help="Electricity consumption by territory",
     )
     st.caption("Actual electricity consumption")
 
@@ -55,7 +52,7 @@ with col3:
     st.metric(
         label="🗺️ Geographic",
         value="Enrichment",
-        help="Communes, climate zones, altitude"
+        help="Communes, climate zones, altitude",
     )
     st.caption("Geographic and climatic context")
 
@@ -63,7 +60,7 @@ with col4:
     st.metric(
         label="⛰️ Altitude",
         value="Elevation API",
-        help="Precise altitude from GPS coordinates"
+        help="Precise altitude from GPS coordinates",
     )
     st.caption("Altitude enrichment")
 
@@ -79,7 +76,6 @@ of housing and classifies them from **A (most efficient)** to **G (least efficie
 
 # Dynamic retrieval of variables from the ADEME API
 with st.expander("📋 See available DPE variables (fetched in real time from the API)"):
-    
     # Choose between existing and new housing
     col1, col2 = st.columns(2)
     with col1:
@@ -87,20 +83,22 @@ with st.expander("📋 See available DPE variables (fetched in real time from th
             "Housing type",
             ["Existing housing", "New housing"],
             index=0,
-            horizontal=True
+            horizontal=True,
         )
-    
+
     neuf = dataset_type == "New housing"
-    
+
     try:
         with st.spinner(f"Fetching ADEME API metadata ({dataset_type})..."):
             requester = Ademe_API_requester()
             fields_by_group = requester.get_fields_by_group(neuf=neuf)
-        
+
         if fields_by_group:
             total_fields = sum(len(fields) for fields in fields_by_group.values())
-            st.success(f"✅ {total_fields} variables successfully retrieved from the ADEME API")
-            
+            st.success(
+                f"✅ {total_fields} variables successfully retrieved from the ADEME API"
+            )
+
             # Show stats
             col1, col2, col3 = st.columns(3)
             with col1:
@@ -112,43 +110,45 @@ with st.expander("📋 See available DPE variables (fetched in real time from th
                 all_fields = []
                 for fields in fields_by_group.values():
                     all_fields.extend(fields)
-                types_count = len(set(f['type'] for f in all_fields))
+                types_count = len(set(f["type"] for f in all_fields))
                 st.metric("🔢 Data types", types_count)
-            
+
             # Display by group
             st.markdown("#### 📋 Variables by group")
-            
+
             for group_name in sorted(fields_by_group.keys()):
                 group_fields = fields_by_group[group_name]
-                
+
                 with st.container():
                     st.markdown(f"**📁 {group_name}** ({len(group_fields)} fields)")
-                    
+
                     # Create a DataFrame for display
                     df_group = pd.DataFrame(group_fields)
-                    display_df = df_group[['key', 'label', 'type', 'description']].copy()
-                    display_df.columns = ['Field name', 'Label', 'Type', 'Description']
-                    
+                    display_df = df_group[
+                        ["key", "label", "type", "description"]
+                    ].copy()
+                    display_df.columns = ["Field name", "Label", "Type", "Description"]
+
                     st.dataframe(
                         display_df,
-                        width='stretch',
+                        width="stretch",
                         hide_index=True,
-                        height=min(len(group_fields) * 35 + 38, 400)
+                        height=min(len(group_fields) * 35 + 38, 400),
                     )
-            
+
             # Export metadata option
             st.divider()
             st.markdown("#### 💾 Export metadata")
-            
+
             # Create a DataFrame with all fields
             all_fields_list = []
             for group, fields in fields_by_group.items():
                 for field in fields:
                     all_fields_list.append(field)
-            
+
             df_all_fields = pd.DataFrame(all_fields_list)
             csv = df_all_fields.to_csv(index=False)
-            
+
             filename = f"ademe_api_fields_{'new' if neuf else 'existing'}.csv"
             st.download_button(
                 label="📥 Download full variable list (CSV)",
@@ -156,14 +156,14 @@ with st.expander("📋 See available DPE variables (fetched in real time from th
                 file_name=filename,
                 mime="text/csv",
             )
-            
+
     except Exception as e:
         st.error(f"❌ Error while fetching variables: {e}")
-        
+
         # Fallback with basic information
         st.markdown("**Main variables (basic information)**:")
         col1, col2 = st.columns(2)
-        
+
         with col1:
             st.markdown("""
             **Identifiers and location**
@@ -182,7 +182,7 @@ with st.expander("📋 See available DPE variables (fetched in real time from th
             - `Type_énergie_principale_chauffage`: Main heating energy
             - `Isolation_toiture`, `Isolation_murs`, `Isolation_plancher_bas`
             """)
-        
+
         with col2:
             st.markdown("""
             **Energy performance**
@@ -212,56 +212,62 @@ st.markdown("""
 allowing to enrich the analysis with real consumption data.
 """)
 
-with st.expander("📋 See available Enedis variables (fetched in real time from the API)"):
+with st.expander(
+    "📋 See available Enedis variables (fetched in real time from the API)"
+):
     try:
         with st.spinner("Fetching Enedis API metadata..."):
             requester = Enedis_API_requester()
             fields = requester.get_dataset_fields()
-        
+
         if fields:
-            st.success(f"✅ {len(fields)} variables successfully retrieved from the Enedis API")
-            
+            st.success(
+                f"✅ {len(fields)} variables successfully retrieved from the Enedis API"
+            )
+
             # Create a DataFrame for display
             df_fields = pd.DataFrame(fields)
-            
+
             # Show stats
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric("📊 Total fields", len(fields))
             with col2:
-                types_count = df_fields['type'].nunique()
+                types_count = df_fields["type"].nunique()
                 st.metric("🔢 Data types", types_count)
             with col3:
-                with_desc = df_fields['description'].apply(lambda x: bool(x)).sum()
+                with_desc = df_fields["description"].apply(lambda x: bool(x)).sum()
                 st.metric("📝 Documented fields", with_desc)
-            
+
             # Group by data type
             st.markdown("#### 📋 Variables by type")
-            
+
             # Iterate by category
-            types = df_fields['type'].unique()
-            
+            types = df_fields["type"].unique()
+
             for data_type in sorted(types):
-                fields_of_type = df_fields[df_fields['type'] == data_type]
-                
+                fields_of_type = df_fields[df_fields["type"] == data_type]
+
                 with st.container():
-                    st.markdown(f"**Type: `{data_type}`** ({len(fields_of_type)} fields)")
-                    
+                    st.markdown(
+                        f"**Type: `{data_type}`** ({len(fields_of_type)} fields)"
+                    )
+
                     # Compact table
-                    display_df = fields_of_type[['name', 'label', 'description']].copy()
-                    display_df.columns = ['Field name', 'Label', 'Description']
-                    
+                    display_df = fields_of_type[["name", "label", "description"]].copy()
+                    display_df.columns = ["Field name", "Label", "Description"]
+
                     st.dataframe(
                         display_df,
-                        width='stretch',
+                        width="stretch",
                         hide_index=True,
-                        height=min(len(fields_of_type) * 35 + 38, 300)
+                        height=min(len(fields_of_type) * 35 + 38, 300),
                     )
-            
+
             # Export option
             st.divider()
             st.markdown("#### 💾 Export metadata")
-            
+
             csv = df_fields.to_csv(index=False)
             st.download_button(
                 label="📥 Download full variable list (CSV)",
@@ -269,14 +275,14 @@ with st.expander("📋 See available Enedis variables (fetched in real time from
                 file_name="enedis_api_fields.csv",
                 mime="text/csv",
             )
-            
+
     except Exception as e:
         st.error(f"❌ Error while fetching variables: {e}")
-        
+
         # Fallback with basic information
         st.markdown("**Main variables (basic information)**:")
         col1, col2 = st.columns(2)
-        
+
         with col1:
             st.markdown("""
             **Location**
@@ -290,7 +296,7 @@ with st.expander("📋 See available Enedis variables (fetched in real time from
             - Number of sites
             - Average consumption per site
             """)
-        
+
         with col2:
             st.markdown("""
             **Typology**
@@ -330,9 +336,9 @@ with st.expander("📋 See information about the Elevation API"):
     https://api.elevationapi.com/api/Elevation?lat=48.8566&lon=2.3522
     ```
     """)
-    
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
         st.markdown("""
     ### 📊 Returned data
@@ -349,7 +355,7 @@ with st.expander("📋 See information about the Elevation API"):
     - `distance`: Total distance
     - `numPoints`: Number of points
         """)
-    
+
     with col2:
         st.markdown("""
         ### 📁 Source dataset
@@ -367,13 +373,15 @@ with st.expander("📋 See information about the Elevation API"):
         - Accuracy varies by area
         - Multiple sources (SRTM, ASTER, etc.)
         """)
-    
+
     st.info("""
     💡 **Usage in the project**: Altitude is an important factor for DPE calculations 
     because it influences heating needs (lower temperatures at higher altitude).
     """)
 
-st.info("💡 **Source**: [elevationapi.com](https://elevationapi.com) - Global altitude API")
+st.info(
+    "💡 **Source**: [elevationapi.com](https://elevationapi.com) - Global altitude API"
+)
 
 st.divider()
 
@@ -389,17 +397,21 @@ tab1, tab2 = st.tabs(["🌍 French Communes", "🌡️ Climate Zones"])
 
 with tab1:
     st.markdown("### French Communes Reference (2025)")
-    
-    st.info("💡 **Source**: [data.gouv.fr - Communes et villes de France](https://www.data.gouv.fr/datasets/communes-et-villes-de-france-en-csv-excel-json-parquet-et-feather/) - Government open data")
-    
+
+    st.info(
+        "💡 **Source**: [data.gouv.fr - Communes et villes de France](https://www.data.gouv.fr/datasets/communes-et-villes-de-france-en-csv-excel-json-parquet-et-feather/) - Government open data"
+    )
+
     # Chargement et affichage des données des communes
-    data_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "communes-france-2025.csv")
-    
+    data_path = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "data", "communes-france-2025.csv"
+    )
+
     if os.path.exists(data_path):
         try:
             df_communes = pd.read_csv(data_path, nrows=5)
-            
-            st.markdown(f"""
+
+            st.markdown("""
             📊 **File overview**: `communes-france-2025.csv`
             
             This file comes from the **French government's Open Data portal** and contains 
@@ -411,7 +423,7 @@ with tab1:
             - **Updates**: Regular (2025 data)
             - **License**: Open License (Licence Ouverte)
             """)
-            
+
             col1, col2, col3 = st.columns(3)
             with col1:
                 st.metric("📍 Geographic variables", "~40")
@@ -419,7 +431,7 @@ with tab1:
                 st.metric("🏘️ Demographic data", "Yes")
             with col3:
                 st.metric("🔗 Identifiers", "Multiple")
-            
+
             with st.expander("See main available variables"):
                 st.markdown("""
                 **Identifiers and names**
@@ -476,9 +488,9 @@ with tab1:
                 - `url_wikipedia`: Wikipedia page
                 - `url_villedereve`: Ville de rêve page
                 """)
-            
-            st.dataframe(df_communes.head(), width='stretch')
-            
+
+            st.dataframe(df_communes.head(), width="stretch")
+
         except Exception as e:
             st.warning(f"Unable to load preview: {e}")
     else:
@@ -486,49 +498,60 @@ with tab1:
 
 with tab2:
     st.markdown("### Climate Zones by Department")
-    
+
     # Chargement et visualisation des zones climatiques
-    climate_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "climate_zones.csv")
-    
+    climate_path = os.path.join(
+        os.path.dirname(os.path.dirname(__file__)), "data", "climate_zones.csv"
+    )
+
     if os.path.exists(climate_path):
         try:
             df_climate = pd.read_csv(climate_path)
-            
+
             st.markdown("""
             France is divided into **3 regulatory climate zones** for building energy performance calculations:
             """)
-            
+
             col1, col2, col3 = st.columns(3)
-            
+
             with col1:
-                h1_count = len(df_climate[df_climate['Zone climatique'] == 'H1'])
-                st.metric("🥶 Zone H1 (Cold)", f"{h1_count} depts.", 
-                         help="North and East of France - Most rigorous climate")
-            
+                h1_count = len(df_climate[df_climate["Zone climatique"] == "H1"])
+                st.metric(
+                    "🥶 Zone H1 (Cold)",
+                    f"{h1_count} depts.",
+                    help="North and East of France - Most rigorous climate",
+                )
+
             with col2:
-                h2_count = len(df_climate[df_climate['Zone climatique'] == 'H2'])
-                st.metric("🌤️ Zone H2 (Temperate)", f"{h2_count} depts.",
-                         help="Center and West of France - Intermediate climate")
-            
+                h2_count = len(df_climate[df_climate["Zone climatique"] == "H2"])
+                st.metric(
+                    "🌤️ Zone H2 (Temperate)",
+                    f"{h2_count} depts.",
+                    help="Center and West of France - Intermediate climate",
+                )
+
             with col3:
-                h3_count = len(df_climate[df_climate['Zone climatique'] == 'H3'])
-                st.metric("☀️ Zone H3 (Warm)", f"{h3_count} depts.",
-                         help="South of France and Mediterranean coast - Mild climate")
-            
+                h3_count = len(df_climate[df_climate["Zone climatique"] == "H3"])
+                st.metric(
+                    "☀️ Zone H3 (Warm)",
+                    f"{h3_count} depts.",
+                    help="South of France and Mediterranean coast - Mild climate",
+                )
+
             # Graphique de répartition
             fig = px.pie(
-                df_climate.groupby('Zone climatique').size().reset_index(name='count'),
-                values='count',
-                names='Zone climatique',
-                title='Distribution of departments by climate zone',
-                color='Zone climatique',
-                color_discrete_map={'H1': '#4A90E2', 'H2': '#F5A623', 'H3': '#E94B3C'}
+                df_climate.groupby("Zone climatique").size().reset_index(name="count"),
+                values="count",
+                names="Zone climatique",
+                title="Distribution of departments by climate zone",
+                color="Zone climatique",
+                color_discrete_map={"H1": "#4A90E2", "H2": "#F5A623", "H3": "#E94B3C"},
             )
-            st.plotly_chart(fig, width='stretch')
-            
+            st.plotly_chart(fig, width="stretch")
+
             with st.expander("📋 See the full list of departments"):
-                st.dataframe(df_climate, width='stretch', height=400)
-            
+                st.dataframe(df_climate, width="stretch", height=400)
+
         except Exception as e:
             st.warning(f"Unable to load climate data: {e}")
     else:

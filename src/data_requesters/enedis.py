@@ -59,15 +59,15 @@ class Enedis_API_requester(BaseAPIRequester):
         response = requests.get(self.__dataset_url)
         response.raise_for_status()
         dataset_info = response.json()
-        
+
         fields = dataset_info.get("fields", [])
-        
+
         return [
             {
                 "name": field.get("name"),
                 "label": field.get("label"),
                 "type": field.get("type"),
-                "description": field.get("description") or ""
+                "description": field.get("description") or "",
             }
             for field in fields
         ]
@@ -98,11 +98,11 @@ class Enedis_API_requester(BaseAPIRequester):
         print(f"\n{'='*80}")
         print(f"Available fields in Enedis API ({len(fields)} total)")
         print(f"{'='*80}\n")
-        
+
         for i, field in enumerate(fields, 1):
             print(f"{i}. {field['name']}")
             print(f"   Label: {field['label']}")
             print(f"   Type: {field['type']}")
-            if field['description']:
+            if field["description"]:
                 print(f"   Description: {field['description']}")
             print()

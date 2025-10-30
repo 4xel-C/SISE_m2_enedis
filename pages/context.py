@@ -131,7 +131,7 @@ with st.expander("📋 See available DPE variables (fetched in real time from th
                     
                     st.dataframe(
                         display_df,
-                        use_container_width=True,
+                        width='stretch',
                         hide_index=True,
                         height=min(len(group_fields) * 35 + 38, 400)
                     )
@@ -253,7 +253,7 @@ with st.expander("📋 See available Enedis variables (fetched in real time from
                     
                     st.dataframe(
                         display_df,
-                        use_container_width=True,
+                        width='stretch',
                         hide_index=True,
                         height=min(len(fields_of_type) * 35 + 38, 300)
                     )
@@ -477,7 +477,7 @@ with tab1:
                 - `url_villedereve`: Ville de rêve page
                 """)
             
-            st.dataframe(df_communes.head(), use_container_width=True)
+            st.dataframe(df_communes.head(), width='stretch')
             
         except Exception as e:
             st.warning(f"Unable to load preview: {e}")
@@ -524,10 +524,10 @@ with tab2:
                 color='Zone climatique',
                 color_discrete_map={'H1': '#4A90E2', 'H2': '#F5A623', 'H3': '#E94B3C'}
             )
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
             
             with st.expander("📋 See the full list of departments"):
-                st.dataframe(df_climate, use_container_width=True, height=400)
+                st.dataframe(df_climate, width='stretch', height=400)
             
         except Exception as e:
             st.warning(f"Unable to load climate data: {e}")

@@ -4,12 +4,12 @@
 
 import streamlit as st
 
-# ⚙️ General configuration
+# General configuration
 st.set_page_config(
     page_title="DPE Ademe & Enedis - Home", page_icon="🏠", layout="centered"
 )
 
-# 🏠 Title and description
+# Title and description
 st.title("🏠 DPE Dashboard - Ademe & Enedis")
 st.markdown("""
 Welcome to the **DPE Ademe** app, an interactive tool to:
@@ -23,8 +23,8 @@ Select a page below to get started:
 
 st.divider()
 
-# 🔗 Links to pages
-col1, col2, col3, col4, col5 = st.columns(5)
+# Links to pages
+col1, col2, col3 = st.columns(3)
 
 with col1:
     st.page_link("pages/context.py", label="Data Context", icon="📋")
@@ -51,26 +51,15 @@ with col3:
     based on the home's characteristics.
     """)
 
-with col4:
-    st.page_link("pages/api_requests.py", label="Requests to the ADEME API", icon="🌐")
-    st.markdown("""
-    Retrieve data from the **ADEME (DPE) API**.
-    """)
-
-with col5:
-    st.page_link("pages/stat_test.py", label="Stats Dataset DPE", icon="📈")
-    st.markdown("""
-    Analyze and Visualize key statistics of the DPE dataset. 
-    """)
-
 st.divider()
 
-# 🧩 Additional information section
+# Additional information section
 with st.expander("ℹ️ About the application"):
     st.markdown("""
-    - **Author:** Thibaud  
+    - **Author:** Axel, Cyrille, Maissa, Thibaud
     - **Data sources:** [ADEME - DPE](https://data.ademe.fr) & [Enedis Open Data](https://data.enedis.fr)  
-    - **Technologies:** Streamlit, Pydeck, Scikit-Learn  
+    - **Technologies:** Streamlit, Pydeck, Scikit-Learn, Pandas, Plotly  
+    - **Repository:** [GitHub link](
     - **Last update:** October 2025  
     """)
 

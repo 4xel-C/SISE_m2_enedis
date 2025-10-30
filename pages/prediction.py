@@ -54,7 +54,7 @@ st.markdown("### 🧾 Enter the home's characteristics")
 
 # ------------------------------------------------------------------------------------------- Form section
 
-include_cost = st.checkbox("Specify total cost (€/year)?", value=False)
+include_cost = st.checkbox("**Specify total cost (€/year)?**", value=False)
 with st.form("form_pred"):
     # ---- New section: City -> automatic zone & altitude ----
     st.subheader("🏙️ Location")

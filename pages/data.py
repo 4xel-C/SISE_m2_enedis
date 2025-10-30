@@ -116,6 +116,12 @@ if data_csv is not None and data_api is not None:
     with col2:
         st.success(f"✅ Data loaded successfully: {len(data_api)} rows.")
         st.download_button(
+            "💾 Download result API (CSV)",
+            data=data_api.to_csv(index=False).encode("utf-8"),
+            file_name=f"dpe_ademe_{departement}_{'new' if neuf else 'existing'}.csv",
+            mime="text/csv",
+        )
+        st.download_button(
             "💾 Download combine CSV + API (CSV)",
             data=data.to_csv(index=False).encode("utf-8"),
             file_name=file_name,
@@ -264,7 +270,7 @@ if data is not None:
                 tooltip=tooltip,
             )
 
-            st.pydeck_chart(deck, width='stretch')
+            st.pydeck_chart(deck, use_container_width=True)
 
     # --- Tab 3: Statistics ---
     with tab3:

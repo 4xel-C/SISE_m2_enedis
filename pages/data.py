@@ -10,6 +10,9 @@ from streamlit_dynamic_filters import DynamicFilters
 from src.data_requesters import Ademe_API_requester
 from src.processing.data_cleaner import DataCleaner
 
+# Plotly configuration
+config = {"width": "stretch"}
+
 # General configuration
 st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layout="wide")
 
@@ -393,7 +396,7 @@ if data is not None:
             )
             fig_col.update_yaxes(autorange="reversed")
 
-            st.plotly_chart(fig_col, width="stretch")
+            st.plotly_chart(fig_col, config=config)
 
         # GES class Distribution
         with col3:
@@ -440,7 +443,7 @@ if data is not None:
             )
             fig_ges.update_yaxes(autorange="reversed")
 
-            st.plotly_chart(fig_ges, width="stretch")
+            st.plotly_chart(fig_ges, config=config)
 
         # Energy consumption and cost per class DPE
         col1, col2 = st.columns(2)
@@ -455,7 +458,7 @@ if data is not None:
                 points=False,
                 title="Consommation énergie par classe DPE",
             )
-            st.plotly_chart(fig_box, width="stretch")
+            st.plotly_chart(fig_box, config=config)
 
         # Coût moyen par classe DPE
         with col2:
@@ -474,7 +477,7 @@ if data is not None:
             )
 
             fig.update_layout(template="plotly_white", showlegend=False)
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(fig, config=config)
 
         st.divider()
         # ------------------------------------------------------------------------------------------
@@ -577,7 +580,7 @@ if data is not None:
                 margin={"t": 60, "b": 20, "l": 20, "r": 20},  # reduce extra space
             )
 
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(fig, config=config)
 
         # Gauge émission GES
         with col3:
@@ -613,7 +616,7 @@ if data is not None:
                 margin={"t": 60, "b": 20, "l": 20, "r": 20},  # reduce extra space
             )
 
-            st.plotly_chart(fig_ges, width="stretch")
+            st.plotly_chart(fig_ges, config=config)
 
         st.divider()
 
@@ -641,7 +644,7 @@ if data is not None:
                 title=f"Relation entre Consommation énergétique et {option} (Corrélation = {corr_value:.2f})",
             )
 
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(fig, config=config)
 
 else:
     st.info(

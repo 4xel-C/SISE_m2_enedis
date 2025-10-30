@@ -14,6 +14,9 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from src.data_requesters.enedis import Enedis_API_requester
 from src.data_requesters.ademe import Ademe_API_requester
 
+# Plotly configuration
+config = {"width": "stretch"}
+
 # ⚙️ General configuration
 st.set_page_config(page_title="DPE - Data Context", page_icon="📋", layout="wide")
 
@@ -547,7 +550,7 @@ with tab2:
                 color="Zone climatique",
                 color_discrete_map={"H1": "#4A90E2", "H2": "#F5A623", "H3": "#E94B3C"},
             )
-            st.plotly_chart(fig, width="stretch")
+            st.plotly_chart(fig, config=config)
 
             with st.expander("📋 See the full list of departments"):
                 st.dataframe(df_climate, width="stretch", height=400)

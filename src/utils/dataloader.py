@@ -8,15 +8,6 @@ import streamlit as st
 # ============================================================ #
 
 
-# === Path to CSV Files ===
-DATASETS_DIR = Path(__file__).parent.parent.parent / "data" / "datasets"
-
-
-# === Side bar files selection ===
-csv_files = [f.name for f in DATASETS_DIR.glob("*.csv")]
-print(csv_files)
-
-
 @st.cache_data
 def load_csv(path: Path) -> pd.DataFrame:
     """Function to cache loaded dataset.
@@ -30,18 +21,32 @@ def load_csv(path: Path) -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-def generate_file_selector():
-    """Generate a file selector in the sidebar and load the selected file into session state."""
+def generate_file_selector(sidebar: bool = True):
+    """
+    Generate a file selector in the sidebar and load the selected file into session state.
+    Cache the loaded file into st.session_sate.df
+    """
+
+    # === Path to CSV Files ===
+    DATASETS_DIR = Path(__file__).parent.parent.parent / "data" / "datasets"
+
+    # === Side bar files selection ===
+    csv_files = sorted([f.name for f in DATASETS_DIR.glob("*.csv")])
 
     # Get the default index of the menu.
     default_index = (
-        csv_files.index(st.session_state.last_file)
-        if st.session_state.get("last_file", None)
+        csv_files.index(st.session_state.last_file) + 1
+        if st.session_state.get("last_file", None) in csv_files
         else 0
     )
 
     # Call back function.
     def load_selected_file():
+        if st.session_state.selected_file == "Select a dataset":
+            st.session_state.df = None
+            st.session_state.last_file = None
+            return
+
         file_path = DATASETS_DIR / st.session_state.selected_file
         st.session_state.df = load_csv(file_path)
         st.session_state.last_file = st.session_state.selected_file
@@ -50,10 +55,20 @@ def generate_file_selector():
         )
 
     # Selectbox avec on_change
-    st.sidebar.selectbox(
-        "**Select your dataset:**",
-        ["Select a dataset"] + csv_files,
-        index=default_index,
-        key="selected_file",
-        on_change=load_selected_file,
-    )
+    if sidebar:
+        st.sidebar.selectbox(
+            "**Select your dataset:**",
+            ["Select a dataset"] + csv_files,
+            index=default_index,
+            key="selected_file",
+            on_change=load_selected_file,
+        )
+
+    else:
+        st.selectbox(
+            "**Select your dataset:**",
+            ["Select a dataset"] + csv_files,
+            index=default_index,
+            key="selected_file",
+            on_change=load_selected_file,
+        )

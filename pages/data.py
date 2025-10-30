@@ -16,7 +16,7 @@ st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layou
 DATASETS_DIR = Path(__file__).parent.parent / "data" / "datasets"
 
 
-st.title("🗺️ Map and 📊 Statistics of the DPE Dataset")
+st.title("📊 Statistics of the DPE Dataset")
 
 # === Side bar files selection ===
 generate_file_selector()

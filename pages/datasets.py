@@ -5,12 +5,25 @@ import streamlit as st
 
 from src.data_requesters import Ademe_API_requester
 from src.processing.data_cleaner import DataCleaner
+from src.utils.dataloader import generate_file_selector
 
 # General configuration
 st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layout="wide")
 
 # === Path to CSV Files ===
 DATASETS_DIR = Path(__file__).parent.parent / "data" / "datasets"
+
+# === Side bar files selection ===
+csv_files = sorted([f.name for f in DATASETS_DIR.glob("*.csv")])
+
+
+@st.cache_data
+def load_csv(files):
+    dfs = []
+    for f in files:
+        df = pd.read_csv(f)
+        dfs.append(df)
+    return pd.concat(dfs, ignore_index=True)
 
 
 st.title("📂 Manage your Datasets")
@@ -19,14 +32,61 @@ st.title("📂 Manage your Datasets")
 (
     tab1,
     tab2,
-) = st.tabs(["🧮 Your Datasets", "🛜 Download new data"])
+) = st.tabs(["🧮 Your Datasets", "🛜 Fetch new data"])
 
-# === File uploader ===
 
 # === Dataset manager ===
-
+# === File uploader ===
 with tab1:
-    pass
+    if not csv_files:
+        st.warning("⚠️ Aucun dataset disponible.")
+
+    else:
+        generate_file_selector(sidebar=False)
+
+        # Load the data in memory.
+        data = st.session_state.get("df", None)
+
+        if data is None:
+            st.info("⬆️ Please select a dataset to get started.")
+
+        else:
+            st.write(data.head(5))
+
+            # Action butons
+            col1, col2, col3 = st.columns(3)
+
+            with col1:
+                # Download button to download the current dataset
+                st.download_button(
+                    "💾 Download current dataset (CSV)",
+                    data=data.to_csv(index=False).encode("utf-8"),
+                    file_name=f"{st.session_state.last_file}",
+                    mime="text/csv",
+                )
+
+            with col2:
+                # Button to refresh the current data set.
+
+                if st.button("🔄 Refresh and complete current dataset"):
+                    file_path = DATASETS_DIR / st.session_state.last_file
+
+                    st.info("To be implemented.")
+
+                st.warning("⚠️ Completing the data could take a lot of time.")
+                pass
+
+            with col3:
+                # Button to delete the current dataset
+                if st.button("🗑️ Delete this dataset"):
+                    file_path = DATASETS_DIR / st.session_state.last_file
+                    file_path.unlink()  # supprime le fichier
+                    st.success(
+                        f"✅ `{st.session_state.last_file}` supprimé avec succès."
+                    )
+                    st.session_state.df = None
+                    st.session_state.last_file = None
+                    st.rerun()  # recharge la page pour actualiser la liste
 
 
 # === ADEME API Import ===
@@ -49,14 +109,6 @@ with tab2:
         progress_bar = st.progress(1.0)
         status_text = st.text("Data already loaded in session.")
 
-    @st.cache_data
-    def load_csv(files):
-        dfs = []
-        for f in files:
-            df = pd.read_csv(f)
-            dfs.append(df)
-        return pd.concat(dfs, ignore_index=True)
-
     # === Load Data ===
     def progress_cb(current: int, total: int) -> None:
         frac = (current / total) if total else 0.0
@@ -78,11 +130,6 @@ with tab2:
     if fetch_api:
         data_api = load_api(neuf, limit, departement, size)
         if not data_api.empty:
-            # have to add construction year if new building because API does not provide it
-            # if neuf and "annee_construction" not in data_api.columns:
-            #     current_year = datetime.datetime.now().year
-            #     data_api["annee_construction"] = current_year
-
             cleaner_api = DataCleaner(data_api)
             data_api = cleaner_api.clean_all()
             st.session_state.data_api = data_api
@@ -103,6 +150,7 @@ with tab2:
 
         st.write(data_api.head(5))
 
+        # == Action buttons ==
         col1, col2 = st.columns(2)
 
         with col1:
@@ -121,7 +169,8 @@ with tab2:
                 if file_path.exists():
                     if action == "Replace":
                         data_api.to_csv(file_path, index=False)
-                        st.success(f"✅ File `{file_path.name}` replaced.")
+                        st.session_state.has_newfile = True
+                        st.rerun()
 
                     elif action == "Concat & Overwrite":
                         existing_df = pd.read_csv(file_path, low_memory=False)
@@ -132,15 +181,21 @@ with tab2:
 
                         combined_df.to_csv(file_path, index=False)
 
-                        st.success(
-                            f"✅ File `{file_path.name}` updated by concatenation."
-                        )
+                        st.session_state.has_newfile = True
+                        st.rerun()
 
                 else:
                     data_api.to_csv(
                         file_path,
                         index=False,
                     )
+                    st.session_state.has_newfile = True
+                    st.rerun()
+
+            # Update the state to refresh the selection menu.
+            if st.session_state.get("has_newfile", False):
+                st.success(f"✅ File `{file_path.name}` added to your dataset.")
+                st.session_state.has_newfile = False
 
             if file_path.exists():
                 st.warning(f"⚠️ Data for department `{dep}` already exists.")

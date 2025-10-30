@@ -28,94 +28,98 @@ DEFAULT_ROWS_DISPLAY = 10_000
 NB_BINS = 50
 
 # === Filtres latéraux ===
-col_map, col_filters = st.columns([0.75, 0.25])
 
-with col_filters:
-    st.markdown("### 🔎 Filtres")
+if data is not None:
+    col_map, col_filters = st.columns([0.75, 0.25])
 
-    # Choix des classes DPE
-    dpe_classes = ["A", "B", "C", "D", "E", "F", "G"]
-    selected_dpe = []
-    for c in dpe_classes:
-        if st.checkbox(f"Class {c}", value=True, key=f"dpe_{c}"):
-            selected_dpe.append(c)
+    with col_filters:
+        st.markdown("### 🔎 Filtres")
 
-    # Filtrage
-    data_filtered = data[data["etiquette_dpe"].isin(selected_dpe)]
+        # Choix des classes DPE
+        dpe_classes = ["A", "B", "C", "D", "E", "F", "G"]
+        selected_dpe = []
+        for c in dpe_classes:
+            if st.checkbox(f"Class {c}", value=True, key=f"dpe_{c}"):
+                selected_dpe.append(c)
 
-    # Slider to choose the number of points on the map
-    max_points_possible = len(data_filtered)
-    if max_points_possible == 0:
-        st.warning("⚠️ No data matches the selected filters.")
-        st.stop()
+        # Filtrage
+        data_filtered = data[data["etiquette_dpe"].isin(selected_dpe)]
 
-    nb_points_map = st.slider(
-        "Number of homes displayed on the map 🗺️",
-        min_value=0,
-        max_value=max_points_possible,
-        value=min(DEFAULT_POINTS_MAP, max_points_possible),
-        step=10,
-        help="Adjust to limit the number of points and improve smoothness.",
-    )
+        # Slider to choose the number of points on the map
+        max_points_possible = len(data_filtered)
+        if max_points_possible == 0:
+            st.warning("⚠️ No data matches the selected filters.")
+            st.stop()
 
-    if nb_points_map == 0:
-        st.error("🏠 No homes displayed on the map.")
-        st.stop()
-    # Random sampling
-    if len(data_filtered) > nb_points_map:
-        data_map = data_filtered.sample(nb_points_map, random_state=42)
-        st.warning(
-            f"🏠 {nb_points_map:,} homes displayed out of {max_points_possible:,}."
-        )
-    else:
-        data_map = data_filtered
-        st.success(f"🏠 All {len(data_filtered):,} homes are displayed.")
-
-with col_map:
-    with st.spinner("⏳ Generating the map..."):
-        load_bar = st.progress(0.0)
-
-        # Pydeck map
-        view_state = pdk.ViewState(
-            latitude=data_map["lat"].mean(),
-            longitude=data_map["lon"].mean(),
-            zoom=6,
-            pitch=0,
+        nb_points_map = st.slider(
+            "Number of homes displayed on the map 🗺️",
+            min_value=0,
+            max_value=max_points_possible,
+            value=min(DEFAULT_POINTS_MAP, max_points_possible),
+            step=10,
+            help="Adjust to limit the number of points and improve smoothness.",
         )
 
-        load_bar.progress(0.3)
+        if nb_points_map == 0:
+            st.error("🏠 No homes displayed on the map.")
+            st.stop()
+        # Random sampling
+        if len(data_filtered) > nb_points_map:
+            data_map = data_filtered.sample(nb_points_map, random_state=42)
+            st.warning(
+                f"🏠 {nb_points_map:,} homes displayed out of {max_points_possible:,}."
+            )
+        else:
+            data_map = data_filtered
+            st.success(f"🏠 All {len(data_filtered):,} homes are displayed.")
 
-        layer = pdk.Layer(
-            "ScatterplotLayer",
-            data=data_map,
-            get_position="[lon, lat]",
-            get_color="[200, 30, 0, 160]",
-            get_radius=40,
-            pickable=True,
-        )
+    with col_map:
+        with st.spinner("⏳ Generating the map..."):
+            load_bar = st.progress(0.0)
 
-        load_bar.progress(0.5)
+            # Pydeck map
+            view_state = pdk.ViewState(
+                latitude=data_map["lat"].mean(),
+                longitude=data_map["lon"].mean(),
+                zoom=6,
+                pitch=0,
+            )
 
-        tooltip = {
-            "html": "<b>DPE Label:</b> {etiquette_dpe}<br/>"
-            "<b>Total Cost (5 Uses):</b> {cout_total_5_usages}<br/>"
-            "<b>Lat:</b> {lat}<br/><b>Lon:</b> {lon} <br/>",
-            "style": {"backgroundColor": "white", "color": "black"},
-        }
+            load_bar.progress(0.3)
 
-        load_bar.progress(0.6)
+            layer = pdk.Layer(
+                "ScatterplotLayer",
+                data=data_map,
+                get_position="[lon, lat]",
+                get_color="[200, 30, 0, 160]",
+                get_radius=40,
+                pickable=True,
+            )
 
-        deck = pdk.Deck(
-            map_style="mapbox://styles/mapbox/satellite-streets-v12",
-            initial_view_state=view_state,
-            layers=[layer],
-            tooltip=tooltip,  # type: ignore
-        )
+            load_bar.progress(0.5)
 
-        load_bar.progress(0.9)
+            tooltip = {
+                "html": "<b>DPE Label:</b> {etiquette_dpe}<br/>"
+                "<b>Total Cost (5 Uses):</b> {cout_total_5_usages}<br/>"
+                "<b>Lat:</b> {lat}<br/><b>Lon:</b> {lon} <br/>",
+                "style": {"backgroundColor": "white", "color": "black"},
+            }
 
-        st.pydeck_chart(deck, use_container_width=True)
+            load_bar.progress(0.6)
 
-        load_bar.progress(1.0)
+            deck = pdk.Deck(
+                map_style="mapbox://styles/mapbox/satellite-streets-v12",
+                initial_view_state=view_state,
+                layers=[layer],
+                tooltip=tooltip,  # type: ignore
+            )
 
-load_bar.empty()
+            load_bar.progress(0.9)
+
+            st.pydeck_chart(deck, use_container_width=True)
+
+            load_bar.progress(1.0)
+
+    load_bar.empty()
+else:
+    st.info("⬆️ Please upload a dataset to get started.")

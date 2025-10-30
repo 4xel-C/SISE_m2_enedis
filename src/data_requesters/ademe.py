@@ -93,16 +93,16 @@ class Ademe_API_requester(BaseAPIRequester):
             if not data:
                 print("No data could have been fetched, stopping pagination.")
                 break
-            
+
             results = data["results"]
-            
+
             # Trim results if we would exceed the limit
             if limit is not None:
                 remaining = limit - len(all_data)
                 if remaining <= 0:
                     break
                 results = results[:remaining]
-            
+
             all_data.extend(results)
 
             if progress_callback:
@@ -111,11 +111,11 @@ class Ademe_API_requester(BaseAPIRequester):
             print(
                 f"Fetched {len(results)} records. Total so far: {len(all_data)}/{total_length} ({round(len(all_data) / total_length * 100, 2)}%)"
             )
-            
+
             # Break if we've reached the limit
             if limit is not None and len(all_data) >= limit:
                 break
-                
+
             url = data.get("next")  # Get the next page URL.
             params = None  # Clear params for subsequent requests.
         # endwhile

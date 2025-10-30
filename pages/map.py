@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import pandas as pd
 import pydeck as pdk
 import streamlit as st
 
@@ -79,15 +78,15 @@ if data is not None:
 
             # Define DPE colors
             dpe_colors = {
-                "A": [38, 160, 110],    # Dark green
-                "B": [84, 176, 87],     # Green
-                "C": [165, 202, 118],   # Light green
-                "D": [238, 229, 54],    # Yellow
-                "E": [237, 180, 37],    # Orange
-                "F": [231, 131, 63],    # Orange red
-                "G": [212, 38, 41],     # Red
+                "A": [38, 160, 110],  # Dark green
+                "B": [84, 176, 87],  # Green
+                "C": [165, 202, 118],  # Light green
+                "D": [238, 229, 54],  # Yellow
+                "E": [237, 180, 37],  # Orange
+                "F": [231, 131, 63],  # Orange red
+                "G": [212, 38, 41],  # Red
             }
-            
+
             # Add color column to data_map
             data_map["color"] = data_map["etiquette_dpe"].map(
                 lambda x: dpe_colors.get(x, [128, 128, 128])

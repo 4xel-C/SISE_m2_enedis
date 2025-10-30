@@ -12,9 +12,10 @@ The **DPE classification** is a 7-level label ranging from **A** (most energy ef
 
 Since the DPE label is closely linked to total energy costs, the project also includes a **regression model** to predict the annual energy expenditure. Together, these form a **two-model prediction pipeline**.
 
-All the preliminary data explorations, models testing and devlopment are findable in the following repository: [📊 Data exploration and models building](https://github.com/4xel-C/SISE_Enedis_ML_Study)
-
 This project was developed by **four Master SISE students** and concludes the Python and Machine Learning lessons of the program.
+
+> [!NOTE]
+> All the preliminary data explorations, models testing and devlopment are findable in the following repository: [📊 Data exploration and models building](https://github.com/4xel-C/SISE_Enedis_ML_Study)
 
 ---
 
@@ -122,3 +123,10 @@ ml-enedis/
       ├─ dataloader.py
       └─ file_selector.py    # Streamlit file selector               
 ```
+---
+
+<img width="2181" height="1126" alt="image" src="https://github.com/user-attachments/assets/43cc255b-d267-498b-854c-35477353ea1c" />
+
+<img width="2120" height="850" alt="image" src="https://github.com/user-attachments/assets/f91c6bac-559b-427a-a844-3f6baf92a687" />
+
+---

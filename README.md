@@ -124,6 +124,17 @@ ml-enedis/
       ├─ dataloader.py
       └─ file_selector.py    # Streamlit file selector               
 ```
+## 📈 Datasources
+- **ADEME API opendata:**
+    - **[`Existing housing`](https:\\data.ademe.fr\datasets\dpe03existant)**: Exhaustive data on housing specificities.
+    - **[`Recent housing`](https://data.ademe.fr/datasets/dpe03existant)**: Exhaustive on recent housing specificities.
+- **datagouv opendata:**
+    - **[`French cities dabase`](https://www.data.gouv.fr/datasets/communes-et-villes-de-france-en-csv-excel-json-parquet-et-feather)**: Coordinates and information concerning all cities in France.
+    - **[`Elevation API`](https://www.data.gouv.fr/reuses/elevation-api/)**: Used to provide the altitude of specific coordinates.
+    - **[`Climate Zones`](https://www.ecologie.gouv.fr/sites/default/files/documents/La%20r%C3%A9partition%20des%20d%C3%A9partements%20par%20zone%20climatique.pdf)**: Provide climate zone for each department in France.
+    - **[`Cities Geolocalisation`](https://data.geopf.fr/geocodage/search)**: Geocoding cities by their INSEE code.
+    - **[`Cities informations`](https://geo.api.gouv.fr/communes)**: Open API providing complementary information about cities, mainly used to search by name and get the INSEE code for geolocalisation and altitude.
+
 ---
 
 <img width="2181" height="1126" alt="image" src="https://github.com/user-attachments/assets/43cc255b-d267-498b-854c-35477353ea1c" />

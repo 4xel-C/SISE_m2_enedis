@@ -1,4 +1,3 @@
-import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -8,200 +7,22 @@ import pydeck as pdk
 import streamlit as st
 from streamlit_dynamic_filters import DynamicFilters
 
-from src.data_requesters import Ademe_API_requester
-from src.processing.data_cleaner import DataCleaner
+from src.utils.dataloader import generate_file_selector
+
+# General configuration
+st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layout="wide")
 
 # === Path to CSV Files ===
 DATASETS_DIR = Path(__file__).parent.parent / "data" / "datasets"
 
 
-# General configuration
-st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layout="wide")
-
 st.title("🗺️ Map and 📊 Statistics of the DPE Dataset")
 
 # === Side bar files selection ===
+generate_file_selector()
 
-csv_files = [f.name for f in DATASETS_DIR.glob("*.csv")]
-
-
-@st.cache_data
-def load_default_csv(path: Path) -> pd.DataFrame:
-    """Function to cache loaded dataset.
-
-    Args:
-        path (Path): Path to the CSV file.
-
-    Returns:
-        pd.DataFrame: Loaded DataFrame.
-    """
-    return pd.read_csv(path)
-
-
-# Check session state for last file if exists
-if "last_file" in st.session_state and st.session_state.last_file in csv_files:
-    default_index = csv_files.index(st.session_state.last_file)
-else:
-    default_index = 0
-    st.sidebar.info("ℹ️ Select a dataset from the dropdown.")
-
-selected_file = st.sidebar.selectbox(
-    "**Select your dataset:**", csv_files, index=default_index
-)
-
-# Load the file if not already in session state.
-if selected_file and st.session_state.get("file") != selected_file:
-    file_path = DATASETS_DIR / selected_file
-
-    if "df" not in st.session_state:
-        # Temporary placeholder for spinner
-        placeholder = st.sidebar.empty()
-
-        # Saving dataframe and file name in session state.
-        with st.spinner(f"⏳ Loading of `{selected_file}`..."):
-            st.session_state.df = load_default_csv(file_path)
-            st.session_state.last_file = selected_file
-
-
-# === Data upload ===
-col1, col2 = st.columns(2)
-
-with col1:
-    st.header("📂 Data Upload")
-    data_files = st.file_uploader(
-        "Upload one or more CSV files",
-        type=["csv"],
-        accept_multiple_files=True,
-        key="data_files",
-    )
-
-    @st.cache_data
-    def load_csv(files):
-        dfs = []
-        for f in files:
-            df = pd.read_csv(f)
-            dfs.append(df)
-        return pd.concat(dfs, ignore_index=True)
-
-
-with col2:
-    # === ADEME API Import ===
-    st.header("🌐 Import Data from ADEME API")
-    type_bat = st.radio("Building type:", ["Existing", "New"], horizontal=True)
-    neuf = type_bat == "New"
-
-    departement = st.text_input("Department code (e.g.: 75, 13, 59...)", "33")
-    limit = st.number_input("Maximum number to retrieve", 100, 10_000, 1000, step=500)
-    size = st.slider("API batch size (size)", 100, 2500, 500, step=100)
-
-    fetch_api = st.button("🚀 Fetch from ADEME API")
-
-    # Define progress elements
-    progress_bar = st.progress(0.0)
-    status_text = st.empty()
-
-
-def progress_cb(current: int, total: int) -> None:
-    frac = (current / total) if total else 0.0
-    progress_bar.progress(min(1.0, frac))
-    status_text.text(f"Retrieved {current:,} / {total:,}")
-
-
-# @st.cache_data
-def load_api(neuf: bool, limit: int, departement: str, size: int):
-    requester = Ademe_API_requester(size=size)
-    data_api = requester.custom_lines_request(
-        neuf=neuf,
-        limit=limit,
-        progress_callback=progress_cb,
-        qs=f"code_departement_ban:{departement}",
-    )
-    return pd.DataFrame(data_api)
-
-
-# === Global parameters ===
-DEFAULT_POINTS_MAP = 100_000
-DEFAULT_ROWS_DISPLAY = 10_000
-NB_BINS = 50
-
-# === Load Data ===
-data_csv, data_api = None, None
-
-if data_files:
-    # No cleaning for csv upload, just load
-    data_csv = load_csv(data_files)
-
-if "data_api" not in st.session_state:
-    st.session_state.data_api = None
-
-if fetch_api:
-    data_api = load_api(neuf, limit, departement, size)
-    if not data_api.empty:
-        # have to add construction year if new building because API does not provide it
-        # if neuf and "annee_construction" not in data_api.columns:
-        #     current_year = datetime.datetime.now().year
-        #     data_api["annee_construction"] = current_year
-
-        cleaner_api = DataCleaner(data_api)
-        data_api = cleaner_api.clean_all()
-        st.session_state.data_api = data_api
-    else:
-        st.warning("⚠️ No data returned from ADEME API.")
-        st.session_state.data_api = None
-
-data_api = st.session_state.data_api
-
-# === Combine data if both sources ===
-if data_csv is not None and data_api is not None:
-    data = pd.concat([data_csv, data_api], ignore_index=True)
-    data["source"] = ["CSV"] * len(data_csv) + ["API"] * len(data_api)
-
-    # merge file names for download
-    if data_files:
-        csv_names = [f.name.rsplit(".", 1)[0] for f in data_files]
-        csv_part = "+".join(csv_names)
-    else:
-        csv_part = "dataset"
-
-    file_name = (
-        f"{csv_part}+dpe_ademe_{departement}_{'new' if neuf else 'existing'}.csv"
-    )
-    with col1:
-        st.success(f"✅ Data loaded successfully: {len(data_csv)} rows.")
-    with col2:
-        st.success(f"✅ Data loaded successfully: {len(data_api)} rows.")
-        st.download_button(
-            "💾 Download result API (CSV)",
-            data=data_api.to_csv(index=False).encode("utf-8"),
-            file_name=f"dpe_ademe_{departement}_{'new' if neuf else 'existing'}.csv",
-            mime="text/csv",
-        )
-        st.download_button(
-            "💾 Download combine CSV + API (CSV)",
-            data=data.to_csv(index=False).encode("utf-8"),
-            file_name=file_name,
-            mime="text/csv",
-        )
-elif data_csv is not None:
-    data = data_csv
-    data["source"] = "CSV"
-    with col1:
-        st.success(f"✅ Data loaded successfully: {len(data_csv)} rows.")
-elif data_api is not None:
-    data = data_api
-    data["source"] = "API"
-
-    with col2:
-        st.success(f"✅ Data loaded successfully: {len(data_api)} rows.")
-
-        st.download_button(
-            "💾 Download result API (CSV)",
-            data=data.to_csv(index=False).encode("utf-8"),
-            file_name=f"dpe_ademe_{departement}_{'new' if neuf else 'existing'}.csv",
-            mime="text/csv",
-        )
-else:
-    data = None
+# Load the data in memory.
+data = st.session_state.get("df", None)
 
 # === Display Data ===
 if data is not None:
@@ -212,124 +33,22 @@ if data is not None:
         st.stop()
 
     # Main tabs
-    tab1, tab2, tab3 = st.tabs(
-        ["🧮 Datasets Print", "🗺️ DPE Map", "📊 Dataset Statistics"]
-    )
+    (
+        tab1,
+        tab2,
+    ) = st.tabs(["🧮 Datasets Print", "📊 Dataset Statistics"])
 
     # --- Tab 1: Datasets ---
     with tab1:
-        st.subheader("Uploaded and Retrieved Datasets")
-        col1, col2 = st.columns(2)
-        with col1:
-            st.markdown("### Uploaded CSV Files")
-            if data_csv is not None:
-                st.write(f"Number of rows: {len(data_csv)}")
-                st.dataframe(data_csv.head(50), width="stretch")
-            else:
-                st.info("No CSV files uploaded.")
-        with col2:
-            st.markdown("### ADEME API Retrieved Data")
-            if data_api is not None:
-                st.write(f"Number of rows: {len(data_api)}")
-                st.dataframe(data_api.head(50), width="stretch")
-            else:
-                st.info("No data retrieved from ADEME API.")
-
-    # --- Tab 2: Map ---
-    with tab2:
-        st.subheader("Geographical visualization of housing")
-
-        # === Filtres latéraux ===
-        col_map, col_filters = st.columns([0.75, 0.25])
-
-        with col_filters:
-            st.markdown("### 🔎 Filtres")
-
-            # Choix des sources
-            sources = data["source"].unique().tolist()
-            selected_sources = []
-            for s in sources:
-                if st.checkbox(f"Source: {s}", value=True, key=f"src_{s}"):
-                    selected_sources.append(s)
-
-            # Choix des classes DPE
-            dpe_classes = ["A", "B", "C", "D", "E", "F", "G"]
-            selected_dpe = []
-            for c in dpe_classes:
-                if st.checkbox(f"Class {c}", value=True, key=f"dpe_{c}"):
-                    selected_dpe.append(c)
-
-            # Filtrage
-            data_filtered = data[
-                data["source"].isin(selected_sources)
-                & data["etiquette_dpe"].isin(selected_dpe)
-            ]
-
-            # Slider to choose the number of points on the map
-            max_points_possible = len(data_filtered)
-            if max_points_possible == 0:
-                st.warning("⚠️ No data matches the selected filters.")
-                st.stop()
-
-            nb_points_map = st.slider(
-                "Number of homes displayed on the map 🗺️",
-                min_value=0,
-                max_value=max_points_possible,
-                value=min(DEFAULT_POINTS_MAP, max_points_possible),
-                step=10,
-                help="Adjust to limit the number of points and improve smoothness.",
-            )
-
-            if nb_points_map == 0:
-                st.error("🏠 No homes displayed on the map.")
-                st.stop()
-            # Random sampling
-            if len(data_filtered) > nb_points_map:
-                data_map = data_filtered.sample(nb_points_map, random_state=42)
-                st.warning(
-                    f"🏠 {nb_points_map:,} homes displayed out of {max_points_possible:,}."
-                )
-            else:
-                data_map = data_filtered
-                st.success(f"🏠 All {len(data_filtered):,} homes are displayed.")
-
-        with col_map:
-            # Pydeck map
-            view_state = pdk.ViewState(
-                latitude=data_map["lat"].mean(),
-                longitude=data_map["lon"].mean(),
-                zoom=6,
-                pitch=0,
-            )
-
-            layer = pdk.Layer(
-                "ScatterplotLayer",
-                data=data_map,
-                get_position="[lon, lat]",
-                get_color="[200, 30, 0, 160]",
-                get_radius=40,
-                pickable=True,
-            )
-
-            tooltip = {
-                "html": "<b>DPE Label:</b> {etiquette_dpe}<br/>"
-                "<b>Total Cost (5 Uses):</b> {cout_total_5_usages}<br/>"
-                "<b>Lat:</b> {lat}<br/><b>Lon:</b> {lon} <br/>"
-                "<b>Source:</b> {source}",
-                "style": {"backgroundColor": "white", "color": "black"},
-            }
-
-            deck = pdk.Deck(
-                map_style="mapbox://styles/mapbox/satellite-streets-v12",
-                initial_view_state=view_state,
-                layers=[layer],
-                tooltip=tooltip,  # type: ignore
-            )
-
-            st.pydeck_chart(deck, use_container_width=True)
+        st.subheader("Your data preview")
+        if data is not None:
+            st.write(f"Number of rows: {len(data)}")
+            st.dataframe(data.head(50), width="stretch")
+        else:
+            st.info("No CSV files uploaded.")
 
     # --- Tab 3: Statistics ---
-    with tab3:
+    with tab2:
         # ------------------------------------------------------------------------------------------
 
         # Filter Section
@@ -343,6 +62,9 @@ if data is not None:
         dynamic_filters.display_filters(location="columns", num_columns=3, gap="large")
 
         filtered_df = dynamic_filters.filter_df()
+
+        # Get the number of filtered rows
+        n = filtered_df.shape[0]
 
         st.divider()
 
@@ -684,7 +406,7 @@ if data is not None:
         with col2:
             corr_value = filtered_df["conso_5_usages_ef"].corr(filtered_df[option])
             fig = px.scatter(
-                filtered_df,
+                filtered_df.sample(n=1000 if n > 1000 else n, random_state=42),
                 x="conso_5_usages_ef",  # X is fixed as total consumption
                 y=option,
                 labels={
@@ -697,6 +419,4 @@ if data is not None:
             st.plotly_chart(fig, width="stretch")
 
 else:
-    st.info(
-        "⬆️ Please upload one or more CSV files or fetch ADEME API data to get started."
-    )
+    st.info("⬆️ Please upload a dataset to get started.")

@@ -1,6 +1,7 @@
 # ⚡ ml-enedis: Master SISE Project
 ![Python version](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
-![Streamlit version](https://img.shields.io/badge/Streamlit-1.25-orange?logo=streamlit&logoColor=white)
+![Streamlit version](https://img.shields.io/badge/Streamlit-1.50-orange?logo=streamlit&logoColor=white)
+![Scikit-learn version](https://img.shields.io/badge/scikit--learn-1.7.2-orange?logo=scikit-learn&logoColor=white)
 
 ## 🧠 Introduction
 This repository hosts a complete **web application** that provides an interface for **data analysis**, **dataset management**, and **prediction** using **pretrained machine learning models**. The application predicts:

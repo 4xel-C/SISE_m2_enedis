@@ -323,7 +323,7 @@ if data is not None:
                 map_style="mapbox://styles/mapbox/satellite-streets-v12",
                 initial_view_state=view_state,
                 layers=[layer],
-                tooltip=tooltip,  # type: ignore[arg-type]. False positive mypy.
+                tooltip=tooltip,  # type: ignore
             )
 
             st.pydeck_chart(deck, use_container_width=True)

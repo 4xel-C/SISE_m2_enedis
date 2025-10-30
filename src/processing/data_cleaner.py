@@ -64,6 +64,7 @@ class DataCleaner:
             "emission_ges_refroidissement",
             "_geopoint",
             "type_energie_principale_chauffage",
+            "age_batiment",
         ]
 
         self.df = self.df[relevant_columns]
@@ -72,12 +73,23 @@ class DataCleaner:
     def add_construction_year(self) -> pd.DataFrame:
         """Add a new column "annee_construction" if missing (from the new housing dataset), filled with the current year."""
 
-        # If the column is missing, add it with the current year.
-        if "annee_construction" not in self.df.columns:
-            self.df["annee_construction"] = dt.datetime.now().year
+        current_year = dt.datetime.now().year
 
-        # Add the age of the building.
-        self.df["age_batiment"] = dt.datetime.now().year - self.df["annee_construction"]
+        # Check if the column is missing.
+        if "annee_construction" not in self.df.columns:
+            # Add the year column if missing values.
+            self.df["annee_construction"] = current_year
+
+        # Set missing values to median year of construction.
+        self.df["annee_construction"].fillna(
+            self.df["annee_construction"].median(), inplace=True
+        )
+
+        # Convert to integer if needed.
+        self.df["annee_construction"] = self.df["annee_construction"].astype(int)
+
+        # Create the age column.
+        self.df["age_batiment"] = current_year - self.df["annee_construction"]
 
         return self.df
 

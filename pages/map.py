@@ -107,7 +107,7 @@ if data is not None:
                 data=data_map,
                 get_position="[lon, lat]",
                 get_color="color",
-                get_radius=40,
+                get_radius=10,
                 pickable=True,
             )
 

@@ -1,5 +1,4 @@
 import os
-
 import joblib
 import pandas as pd
 import streamlit as st
@@ -11,76 +10,79 @@ from src.data_requesters.elevation import Elevation_API_requester
 st.set_page_config(page_title="DPE Prediction", page_icon="🔮", layout="centered")
 st.title("🔮 Prediction of a Home's DPE Class")
 
-# Model loading
 ML_DIR = "MLmodels"
-
-# assets folder
 ASSETS = "assets"
 
+# Dynamic model selector in sidebar
 
-@st.cache_resource
-def load_pipeline_classification():
-    return joblib.load(os.path.join(ML_DIR, "pipeline_xgboost_classification.pkl"))
+def get_available_model_versions():
+    """Detect which model versions exist."""
+    options = ["Original models"]
+    retrain_reg = os.path.join(ML_DIR, "pipeline_best_regression_retrained.pkl")
+    retrain_clf = os.path.join(ML_DIR, "pipeline_xgboost_classification_retrained.pkl")
+    if os.path.exists(retrain_reg) and os.path.exists(retrain_clf):
+        options.append("New models (retrained)")
+    return options
 
+def load_models(selection):
+    """Load regression/classification pipelines and label encoder."""
+    if selection == "New models (retrained)":
+        reg_path = os.path.join(ML_DIR, "pipeline_best_regression_retrained.pkl")
+        clf_path = os.path.join(ML_DIR, "pipeline_xgboost_classification_retrained.pkl")
+    else:
+        reg_path = os.path.join(ML_DIR, "pipeline_best_regression.pkl")
+        clf_path = os.path.join(ML_DIR, "pipeline_xgboost_classification.pkl")
 
-@st.cache_resource
-def load_pipeline_regression():
-    return joblib.load(os.path.join(ML_DIR, "pipeline_best_regression.pkl"))
+    reg_model = joblib.load(reg_path)
+    clf_model = joblib.load(clf_path)
+    label_enc = joblib.load(os.path.join(ML_DIR, "label_encoder_target.pkl"))
+    return reg_model, clf_model, label_enc
 
+# Sidebar model selection
+st.sidebar.header("⚙️ Settings")
+available_models = get_available_model_versions()
+model_choice = st.sidebar.selectbox(
+    "🧠 Model selection",
+    options=available_models,
+    help="Choose which version of the models to use for prediction."
+)
+st.sidebar.info(f"Using: **{model_choice}**")
 
-@st.cache_resource
-def load_label_encoder():
-    return joblib.load(os.path.join(ML_DIR, "label_encoder_target.pkl"))
-
-
+# Load models safely
 try:
-    pipeline_classification = load_pipeline_classification()
-    pipeline_regression = load_pipeline_regression()
-    label_encoder = load_label_encoder()
-except ModuleNotFoundError as e:
-    st.error(f"❌ Missing library to load the model: {e}")
-    st.stop()
+    pipeline_regression, pipeline_classification, label_encoder = load_models(model_choice)
+    st.sidebar.success("✅ ML models successfully loaded")
 except FileNotFoundError as e:
-    st.error(f"❌ Missing file: {e}")
+    st.error(f"❌ Missing model file: {e}")
     st.stop()
 except Exception as e:
     st.error(f"❌ Error while loading models: {e}")
     st.stop()
 
-st.sidebar.success("✅ ML models successfully loaded")
-
-# User form
+# 🧾 User form
 st.markdown("### 🧾 Enter the home's characteristics")
-
-# ------------------------------------------------------------------------------------------- Form section
 
 include_cost = st.checkbox("**Specify total cost (€/year)?**", value=False)
 with st.form("form_pred"):
-    # ---- New section: City -> automatic zone & altitude ----
+    # ---- City input (auto climate zone & altitude)
     st.subheader("🏙️ Location")
-
     city = st.text_input("City name", placeholder="e.g. Marseille, Lyon, Lille...")
 
-    # ---- Main quantitative inputs ----
+    # ---- Quantitative inputs
     st.subheader("🔹 Quantitative characteristics")
-
-    # Optional cost input.
     cout_total_5_usages = None
-
     if include_cost:
         cout_total_5_usages = st.number_input(
             "Total cost 5 uses (€/year)", 0.0, 5000.0, 500.0, 10.0
         )
-
     surface_habitable_logement = st.number_input(
         "Living area (m²)", 10.0, 400.0, 75.0, 1.0
     )
     nombre_niveau_logement = st.number_input("Number of floors", 1, 10, 2)
     age_batiment = st.number_input("Building age (years)", 0, 150, 33)
 
-    # ---- Qualitative inputs ----
+    # ---- Qualitative inputs
     st.subheader("🔹 Qualitative characteristics")
-
     energy_options = {
         "Other": "Autre",
         "Natural gas": "Gaz naturel",
@@ -99,15 +101,13 @@ with st.form("form_pred"):
 
     submitted = st.form_submit_button("🔮 Predict DPE class")
 
-# ------------------------------------------------------------------------------------------- Submission
-
-# Prediction
+# 🚀 Prediction
 if submitted:
     if not city.strip():
         st.error("❌ Please enter a city name before predicting.")
         st.stop()
 
-    # ---- Step 1: Retrieve zone & coordinates
+    # ---- Step 1: Retrieve location info
     with st.spinner(f"📡 Retrieving climate zone for {city}..."):
         geo_info = geo_api.get_city_info(ville=city)
         zone_clim = geo_info.get("zone_climatique") if geo_info else None
@@ -120,7 +120,6 @@ if submitted:
         st.warning("⚠️ Could not retrieve coordinates for this city.")
         altitude_moyenne = 0
     else:
-        # ---- Step 2: Retrieve elevation
         with st.spinner(f"⛰️ Fetching elevation data for {city}..."):
             elev_requester = Elevation_API_requester()
             altitude_moyenne = elev_requester.get_elevation(lat, lon) or 0
@@ -147,21 +146,17 @@ if submitted:
         "type_batiment": building_options[type_batiment_label],
         "zone_climatique": zone_clim,
     }
-
     X_input = pd.DataFrame([user_input])
 
-    # Check if the cost prediction is necessary.
+    # ---- Regression prediction if needed
     need_regression = X_input["cout_total_5_usages"].isnull().any()
-
     if need_regression:
         cost_pred = pipeline_regression.predict(
             X_input.drop(columns=["cout_total_5_usages"])
         )
-
-        # Complete the cost in the input data for classification.
         X_input["cout_total_5_usages"] = cost_pred[0]
 
-    # ---- Prediction
+    # ---- Classification prediction
     try:
         y_pred_int = pipeline_classification.predict(X_input)
         y_pred_label = label_encoder.inverse_transform(y_pred_int)
@@ -181,20 +176,14 @@ if submitted:
     }
     couleur = dpe_colors.get(str(y_pred_label[0]).upper(), "#CCCCCC")
 
-    # ------------------------------------------------------------------------------------------- Results display
     if need_regression:
         st.success(
             f"✅ Predicted Cost: **{int(X_input['cout_total_5_usages'][0])} €/year**"
         )
-
     st.success(f"✅ Predicted DPE class: **{y_pred_label[0]}**")
 
-    # select the correct icon name.
+    # Centered image of the DPE label
     icon = f"DPE-{y_pred_label[0].upper()}.png"
-
-    # Create columns to center the image
     col1, col2, col3 = st.columns([1, 2, 1])
-
     with col2:
-        # Adding the logo of the DPE.
         st.image(os.path.join(ASSETS, icon), width=200)

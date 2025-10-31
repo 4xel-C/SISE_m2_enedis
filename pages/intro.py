@@ -60,7 +60,7 @@ with col4:
     st.markdown("""
     Access and download the datasets used in this project.
     """)
-    
+
 with col5:
     st.page_link("pages/prediction.py", label="Predict DPE class", icon="🔮")
     st.markdown("""
@@ -74,7 +74,7 @@ with col6:
     Retrain both regression and classification models on a new dataset of your choice.  
     Compare performance with previous models.
     """)
-    
+
 st.divider()
 
 # Additional information section

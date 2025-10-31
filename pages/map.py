@@ -14,6 +14,7 @@ DATASETS_DIR = Path(__file__).parent.parent / "data" / "datasets"
 
 st.title("🗺️ Map the DPE Dataset")
 
+
 with st.sidebar:
     st.header("📂 Dataset Selection")
 

@@ -1,4 +1,5 @@
 import os
+
 import joblib
 import pandas as pd
 import streamlit as st
@@ -72,8 +73,10 @@ with st.form("form_pred"):
     # ---- City input (auto climate zone & altitude)
     st.subheader("🏙️ Location")
     city = st.text_input("City name", placeholder="e.g. Marseille, Lyon, Lille...")
-    st.caption("💡 You can also specify a district, e.g. 'Lyon 1', 'Paris 15', 'Marseille 8'.")
-    
+    st.caption(
+        "💡 You can also specify a district, e.g. 'Lyon 1', 'Paris 15', 'Marseille 8'."
+    )
+
     # ---- Quantitative inputs
     st.subheader("🔹 Quantitative characteristics")
     cout_total_5_usages = None

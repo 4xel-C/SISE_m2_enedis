@@ -69,7 +69,7 @@ with tab1:
             with col2:
                 # Button to refresh the current data set.
 
-                if st.button("🔄 Refresh and complete current dataset"):
+                if st.button("🔄 Refresh the current dataset with new data"):
                     file_path = DATASETS_DIR / st.session_state.last_file
 
                     # List to get the new data from the both API endpoints

@@ -69,7 +69,7 @@ class DataCleaner:
             "numero_dpe",
         ]
 
-        self.df = self.df[relevant_columns]
+        self.df = self.df.loc[:, relevant_columns]
         return self.df
 
     def add_construction_year(self) -> pd.DataFrame:
@@ -83,8 +83,8 @@ class DataCleaner:
             self.df["annee_construction"] = current_year
 
         # Set missing values to median year of construction.
-        self.df["annee_construction"].fillna(
-            self.df["annee_construction"].median(), inplace=True
+        self.df.loc[:, "annee_construction"] = self.df["annee_construction"].fillna(
+            self.df["annee_construction"].median()
         )
 
         # Convert to integer if needed.
@@ -116,23 +116,14 @@ class DataCleaner:
     def energie_type_cleaning(self) -> pd.DataFrame:
         """Clean the "type_energie_principale_chauffage" column."""
 
-        # Distribution.
-        chauffage_distribution = (
-            self.df["type_energie_principale_chauffage"].value_counts(normalize=True)
-            * 100
-        )
+        # Major classes:
+        energie_types = ["Gaz naturel", "Électricité"]
 
-        threshold = 15
-
-        # Getting the list of all the modalities not reaching the threshold.
-        rare_modalities = chauffage_distribution[
-            chauffage_distribution < threshold
-        ].index.tolist()
-
-        # Replacing rare modalities by "Autre" in the dataframe.
-        self.df.loc[:, "type_energie_principale_chauffage"] = self.df[
-            "type_energie_principale_chauffage"
-        ].replace(rare_modalities, "Autre")
+        # Replacing all the minor modalities into one single "Autre" modality.
+        self.df.loc[
+            ~self.df["type_energie_principale_chauffage"].isin(energie_types),
+            "type_energie_principale_chauffage",
+        ] = "Autre"
 
         return self.df
 

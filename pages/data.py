@@ -21,6 +21,10 @@ DATASETS_DIR = Path(__file__).parent.parent / "data" / "datasets"
 st.title("📊 Statistics of the DPE Dataset")
 
 # === Side bar files selection ===
+
+with st.sidebar:
+    st.header("📂 Dataset Selection")
+
 generate_file_selector()
 
 # Load the data in memory.

@@ -29,10 +29,10 @@ Select a page below to get started:
 st.divider()
 
 # Links to pages
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4, col5, col6 = st.columns(6)
 
 with col1:
-    st.page_link("pages/context.py", label="Data Context", icon="📋")
+    st.page_link("pages/context.py", label="Context", icon="📋")
     st.markdown("""
     Overview of available data and schemas.  
     - Live variables from ADEME & Enedis APIs  
@@ -42,20 +42,39 @@ with col1:
     """)
 
 with col2:
-    st.page_link("pages/data.py", label="Explore the DPE map and statistics", icon="📊")
+    st.page_link("pages/data.py", label="Statistics & Visualizations", icon="📊")
     st.markdown("""
-    Visualize up to hundreds of thousands of homes on an **interactive map**.  
-    Filter by region, department, or energy class.  
-    Quickly explore the main characteristics of your dataset: distributions, missing values, and descriptive statistics to better understand your data.
+    Quickly explore the main characteristics of your dataset: 
+    distributions, missing values, and descriptive statistics to better understand your data.
     """)
 
 with col3:
+    st.page_link("pages/map.py", label="DPE Map", icon="🗺️")
+    st.markdown("""
+    Visualize up to hundreds of thousands of homes on an **interactive map**.  
+    Filter by region, department, or energy class.
+    """)
+
+with col4:
+    st.page_link("pages/datasets.py", label="Datasets and Download", icon="🗃️")
+    st.markdown("""
+    Access and download the datasets used in this project.
+    """)
+    
+with col5:
     st.page_link("pages/prediction.py", label="Predict DPE class", icon="🔮")
     st.markdown("""
     Use your **prediction models (.pkl)** to estimate the **DPE class (A → G)**  
     based on the home's characteristics.
     """)
 
+with col6:
+    st.page_link("pages/retrain_models.py", label="Model Retraining", icon="⚙️")
+    st.markdown("""
+    Retrain both regression and classification models on a new dataset of your choice.  
+    Compare performance with previous models.
+    """)
+    
 st.divider()
 
 # Additional information section
@@ -71,4 +90,4 @@ with col2:
         - **Last update:** October 2025  
         """)
 
-st.caption("💡 Tip: use the left sidebar to navigate between pages.")
+    st.caption("💡 Tip: use the left sidebar to navigate between pages.")

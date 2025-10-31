@@ -72,7 +72,8 @@ with st.form("form_pred"):
     # ---- City input (auto climate zone & altitude)
     st.subheader("🏙️ Location")
     city = st.text_input("City name", placeholder="e.g. Marseille, Lyon, Lille...")
-
+    st.caption("💡 You can also specify a district, e.g. 'Lyon 1', 'Paris 15', 'Marseille 8'.")
+    
     # ---- Quantitative inputs
     st.subheader("🔹 Quantitative characteristics")
     cout_total_5_usages = None
@@ -156,17 +157,66 @@ if submitted:
     # ---- Regression prediction if needed
     need_regression = X_input["cout_total_5_usages"].isnull().any()
     if need_regression:
-        cost_pred = pipeline_regression.predict(
-            X_input.drop(columns=["cout_total_5_usages"])
-        )
-        X_input["cout_total_5_usages"] = cost_pred[0]
+        try:
+            cost_pred = pipeline_regression.predict(
+                X_input.drop(columns=["cout_total_5_usages"])
+            )
+            X_input["cout_total_5_usages"] = cost_pred[0]
+
+        except ValueError as e:
+            msg = str(e)
+            if "Found unknown categories" in msg:
+                bad_cat = msg.split("['")[1].split("']")[0]
+                if "in column" in msg:
+                    col_part = msg.split("in column")[1].strip().split()[0]
+                    col_name = (
+                        X_input.columns[int(col_part)]
+                        if col_part.isdigit()
+                        else col_part
+                    )
+                else:
+                    col_name = "unknown column"
+                st.error(
+                    f"⚠️ The regression model doesn't recognize category **'{bad_cat}'** "
+                    f"for variable **'{col_name}'**.\n\n"
+                    f"This usually means your input contains a new value not seen during training.\n\n"
+                    f"👉 Try switching to the **retrained model** in the sidebar or choose a different input."
+                )
+                st.stop()
+            else:
+                st.error(f"❌ Error during cost prediction: {e}")
+                st.stop()
 
     # ---- Classification prediction
     try:
         y_pred_int = pipeline_classification.predict(X_input)
         y_pred_label = label_encoder.inverse_transform(y_pred_int)
+
+    except ValueError as e:
+        msg = str(e)
+        if "Found unknown categories" in msg:
+            bad_cat = msg.split("['")[1].split("']")[0]
+            if "in column" in msg:
+                col_part = msg.split("in column")[1].strip().split()[0]
+                col_name = (
+                    X_input.columns[int(col_part)] if col_part.isdigit() else col_part
+                )
+            else:
+                col_name = "unknown column"
+            st.error(
+                f"⚠️ The model doesn't recognize category **'{bad_cat}'** "
+                f"for variable **'{col_name}'**.\n\n"
+                f"This typically means your input contains a value never seen during training "
+                f"(e.g., a new climate zone or energy type).\n\n"
+                f"👉 Try using the **retrained model** in the sidebar."
+            )
+            st.stop()
+        else:
+            st.error(f"❌ Unexpected error during prediction:\n\n```\n{e}\n```")
+            st.stop()
+
     except Exception as e:
-        st.error(f"❌ Error during prediction: {e}")
+        st.error(f"❌ Unexpected error during prediction:\n\n```\n{e}\n```")
         st.stop()
 
     # ---- Display result

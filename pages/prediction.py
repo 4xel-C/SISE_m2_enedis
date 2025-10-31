@@ -15,6 +15,7 @@ ASSETS = "assets"
 
 # Dynamic model selector in sidebar
 
+
 def get_available_model_versions():
     """Detect which model versions exist."""
     options = ["Original models"]
@@ -23,6 +24,7 @@ def get_available_model_versions():
     if os.path.exists(retrain_reg) and os.path.exists(retrain_clf):
         options.append("New models (retrained)")
     return options
+
 
 def load_models(selection):
     """Load regression/classification pipelines and label encoder."""
@@ -38,19 +40,22 @@ def load_models(selection):
     label_enc = joblib.load(os.path.join(ML_DIR, "label_encoder_target.pkl"))
     return reg_model, clf_model, label_enc
 
+
 # Sidebar model selection
 st.sidebar.header("⚙️ Settings")
 available_models = get_available_model_versions()
 model_choice = st.sidebar.selectbox(
     "🧠 Model selection",
     options=available_models,
-    help="Choose which version of the models to use for prediction."
+    help="Choose which version of the models to use for prediction.",
 )
 st.sidebar.info(f"Using: **{model_choice}**")
 
 # Load models safely
 try:
-    pipeline_regression, pipeline_classification, label_encoder = load_models(model_choice)
+    pipeline_regression, pipeline_classification, label_encoder = load_models(
+        model_choice
+    )
     st.sidebar.success("✅ ML models successfully loaded")
 except FileNotFoundError as e:
     st.error(f"❌ Missing model file: {e}")

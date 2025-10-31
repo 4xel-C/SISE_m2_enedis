@@ -12,7 +12,7 @@ from src.utils.dataloader import generate_file_selector
 config = {"width": "stretch"}
 
 # General configuration
-st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layout="wide")
+st.set_page_config(page_title="Statistics", page_icon="📊", layout="wide")
 
 # === Path to CSV Files ===
 DATASETS_DIR = Path(__file__).parent.parent / "data" / "datasets"

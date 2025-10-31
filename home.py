@@ -19,7 +19,7 @@ pages = {
     "Data": [
         st.Page(PAGES_PATH / "data.py", title="📊 Statistics & Visualizations"),
         st.Page(PAGES_PATH / "map.py", title="🗺️ DPE Map"),
-        st.Page(PAGES_PATH / "datasets.py", title="🗃️ Dataset and Download"),
+        st.Page(PAGES_PATH / "datasets.py", title="🗃️ Datasets and Download"),
     ],
     "Prediction": [
         st.Page(PAGES_PATH / "prediction.py", title="🔮 Predict DPE Class"),

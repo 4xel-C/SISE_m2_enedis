@@ -67,7 +67,7 @@ with col2:
         - **Author:** Axel, Cyrille, Maissa, Thibaud
         - **Data sources:** [ADEME - DPE](https://data.ademe.fr) & [Enedis Open Data](https://data.enedis.fr)  
         - **Technologies:** Streamlit, Pydeck, Scikit-Learn, Pandas, Plotly  
-        - **Repository:** [GitHub link](
+        - **Repository:** [GitHub link](https://github.com/cyrizon/m2_enedis)
         - **Last update:** October 2025  
         """)
 

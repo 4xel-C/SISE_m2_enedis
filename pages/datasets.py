@@ -12,7 +12,7 @@ ASSETS_PATH = Path(__file__).parent.parent / "assets"
 st.sidebar.image(ASSETS_PATH / "light_bulb.gif")
 
 # General configuration
-st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layout="wide")
+st.set_page_config(page_title="Datasets", page_icon="📂", layout="wide")
 
 # === Path to CSV Files ===
 DATASETS_DIR = Path(__file__).parent.parent / "data" / "datasets"

@@ -207,8 +207,7 @@ ml-enedis/
    ├─ processing/           # Data processing modules
    │  └─ data_cleaner.py
    └─ utils/                # Utilities for loading and selecting files
-      ├─ dataloader.py
-      └─ file_selector.py    # Streamlit file selector
+      └─ dataloader.py
 ```
 
 ## 📈 Datasources

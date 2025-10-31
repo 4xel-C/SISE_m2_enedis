@@ -3,7 +3,7 @@ from fastapi import HTTPException
 
 from backend.models.input_model import InputData
 from backend.services import BASE_DIR
-from backend.services.data_prepartion import prepare_data
+from backend.services.data_preparation import prepare_data
 
 CLASSIFICATION_MODEL_PATH = (
     BASE_DIR / "MLmodels" / "pipeline_xgboost_classification.pkl"

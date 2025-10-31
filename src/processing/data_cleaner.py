@@ -20,7 +20,9 @@ class DataCleaner:
             df_zones["Zone climatique"].values, index=df_zones["Departement"]
         ).to_dict()
 
-        self.cities = pd.read_csv(CITY_PATH, dtype={"code_insee": str, "dep_code": str})
+        self.cities = pd.read_csv(
+            CITY_PATH, dtype={"code_insee": str, "dep_code": str}, low_memory=False
+        )
 
         # Groupby department and take the mean altitude to average altitudes per department.
         self.departments = self.cities.groupby("dep_code")["altitude_moyenne"].mean()

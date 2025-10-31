@@ -7,6 +7,10 @@ from src.data_requesters import Ademe_API_requester, api_ademe
 from src.processing.data_cleaner import DataCleaner
 from src.utils.dataloader import generate_file_selector
 
+ASSETS_PATH = Path(__file__).parent.parent / "assets"
+# Image
+st.sidebar.image(ASSETS_PATH / "light_bulb.gif")
+
 # General configuration
 st.set_page_config(page_title="DPE Map & Statistics", page_icon="🗺️", layout="wide")
 

@@ -2,65 +2,63 @@
 # Home
 """
 
+from pathlib import Path
+
 import streamlit as st
 
-# General configuration
-st.set_page_config(
-    page_title="DPE Ademe & Enedis - Home", page_icon="🏠", layout="centered"
+# === Pages path definition and Menu ===
+PAGES_PATH = Path(__file__).parent / "pages"
+ASSETS_PATH = Path(__file__).parent / "assets"
+
+# === Menu Definition ===
+pages = {
+    "Project": [
+        st.Page(PAGES_PATH / "intro.py", title="🏠 Home"),
+        st.Page(PAGES_PATH / "context.py", title="📋 Context"),
+    ],
+    "Data": [
+        st.Page(PAGES_PATH / "data.py", title="📊 Statistics & Visualizations"),
+        st.Page(PAGES_PATH / "map.py", title="🗺️ DPE Map"),
+        st.Page(PAGES_PATH / "datasets.py", title="🗃️ Dataset and Download"),
+    ],
+    "Prediction": [
+        st.Page(PAGES_PATH / "prediction.py", title="🔮 Predict DPE Class"),
+        st.Page(PAGES_PATH / "retrain_models.py", title="⚙️ Model Retraining"),
+    ],
+}
+
+# === CSS For menu style ===
+st.markdown(
+    """
+    <style>
+    /* Categories style */
+     [data-testid="stNavSectionHeader"] {
+        font-size: 1.5rem !important;
+        font-weight: 2300 !important;
+        margin-top: 1.5rem !important;
+        margin-bottom: 0.8rem !important;
+        padding-left: 0.5rem !important;
+    }
+    
+    /* Link style */
+    [data-testid="stSidebarNav"] a {
+        font-size: 1.05rem !important;
+        font-weight: 500 !important;
+    }
+    
+    /* Active page */
+    [data-testid="stSidebarNav"] a[aria-current="page"] {
+        background-color: rgba(255, 190, 0, 0.20) !important;
+        border-left: 4px solid #FF4B4B !important;
+        font-weight: 600 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
-# Title and description
-st.title("🏠 DPE Dashboard - Ademe & Enedis")
-st.markdown("""
-Welcome to the **DPE Ademe** app, an interactive tool to:
-- Explore **housing energy data** (ADEME, Enedis),
-- Visualize **dynamic maps** by geographic area,
-- **Predict the DPE class** of a home using your Machine Learning models,
-- Request data from the **ADEME API** to enrich your analysis.
 
-Select a page below to get started:
-""")
+pg = st.navigation(pages)
 
-st.divider()
 
-# Links to pages
-col1, col2, col3 = st.columns(3)
-
-with col1:
-    st.page_link("pages/context.py", label="Data Context", icon="📋")
-    st.markdown("""
-    Overview of available data and schemas.  
-    - Live variables from ADEME & Enedis APIs  
-    - Communes, climate zones, elevation  
-    - Prediction inputs and processing workflow  
-    - Data quality and sources
-    """)
-
-with col2:
-    st.page_link("pages/data.py", label="Explore the DPE map and statistics", icon="📊")
-    st.markdown("""
-    Visualize up to hundreds of thousands of homes on an **interactive map**.  
-    Filter by region, department, or energy class.  
-    Quickly explore the main characteristics of your dataset: distributions, missing values, and descriptive statistics to better understand your data.
-    """)
-
-with col3:
-    st.page_link("pages/prediction.py", label="Predict DPE class", icon="🔮")
-    st.markdown("""
-    Use your **prediction models (.pkl)** to estimate the **DPE class (A → G)**  
-    based on the home's characteristics.
-    """)
-
-st.divider()
-
-# Additional information section
-with st.expander("ℹ️ About the application"):
-    st.markdown("""
-    - **Author:** Axel, Cyrille, Maissa, Thibaud
-    - **Data sources:** [ADEME - DPE](https://data.ademe.fr) & [Enedis Open Data](https://data.enedis.fr)  
-    - **Technologies:** Streamlit, Pydeck, Scikit-Learn, Pandas, Plotly  
-    - **Repository:** [GitHub link](
-    - **Last update:** October 2025  
-    """)
-
-st.caption("💡 Tip: use the left sidebar to navigate between pages.")
+pg.run()

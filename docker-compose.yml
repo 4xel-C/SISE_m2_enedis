@@ -1,15 +1,37 @@
 version: '3.8'
 
 services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    expose:
+      - "8000"
+    volumes:
+      - ./MLmodels:/app/MLmodels
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    networks:
+      - internal
+
   app:
     build: .
     ports:
-      - "8501:8501"  # Streamlit
-      - "8000:8000"  # FastAPI
+      - "8501:8501"  # Streamlit (seul port exposé publiquement)
     volumes:
       - ./data:/app/data
       - ./MLmodels:/app/MLmodels
     environment:
       - PYTHONUNBUFFERED=1
       - MAPBOX_API_KEY=${MAPBOX_API_KEY}
+      - BACKEND_URL=http://backend:8000
+    depends_on:
+      - backend
     restart: unless-stopped
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

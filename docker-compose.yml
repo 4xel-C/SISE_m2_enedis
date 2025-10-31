@@ -1,34 +1,22 @@
 version: '3.8'
 
 services:
-  backend:
-    build:
-      context: .
-      dockerfile: Dockerfile.api
-    expose:
-      - "8000"
-    volumes:
-      - ./MLmodels:/app/MLmodels
-    environment:
-      - PYTHONUNBUFFERED=1
-    restart: unless-stopped
-    networks:
-      - internal
-
-  app:
+  ml-enedis:
     build: .
+    container_name: ml-enedis-app
     ports:
-      - "8501:8501"  # Streamlit (seul port exposé publiquement)
+      # Seulement Streamlit est exposé
+      - "8501:8501"
     volumes:
       - ./data:/app/data
-      - ./MLmodels:/app/MLmodels
+      - ./MLModels:/app/MLModels
+    restart: unless-stopped
     environment:
       - PYTHONUNBUFFERED=1
-      - MAPBOX_API_KEY=${MAPBOX_API_KEY}
-      - BACKEND_URL=http://backend:8000
-    depends_on:
-      - backend
-    restart: unless-stopped
+      - STREAMLIT_SERVER_PORT=8501
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+      - FASTAPI_HOST=127.0.0.1
+      - FASTAPI_PORT=8000
     networks:
       - internal
 

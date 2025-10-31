@@ -4,16 +4,22 @@
 
 import os
 import sys
+from pathlib import Path
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+from src.data_requesters.ademe import Ademe_API_requester
+from src.data_requesters.enedis import Enedis_API_requester
+
+ASSETS_PATH = Path(__file__).parent.parent / "assets"
+# Image
+st.sidebar.image(ASSETS_PATH / "light_bulb.gif")
+
 # Add parent path to import local modules
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
-from src.data_requesters.ademe import Ademe_API_requester
-from src.data_requesters.enedis import Enedis_API_requester
 
 # Plotly configuration
 config = {"width": "stretch"}

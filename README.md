@@ -1,4 +1,4 @@
-# ⚡ ml-enedis: Master SISE Project
+# ⚡ m2-enedis: Master SISE Project
 
 ![Python version](https://img.shields.io/badge/Python-3.13-blue?logo=python&logoColor=white)
 ![Streamlit version](https://img.shields.io/badge/Streamlit-1.50-orange?logo=streamlit&logoColor=white)

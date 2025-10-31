@@ -150,19 +150,24 @@ if st.button("🚀 Retrain models"):
                 os.path.join(MODELS_DIR, "pipeline_xgboost_classification.pkl")
             )
 
+            # Import the original label encoder to decode predicted labels for the original model (for comparison purposes)
             label_encoder_original = joblib.load(
                 os.path.join(MODELS_DIR, "label_encoder_target.pkl")
             )
 
+            # Create a new label encoder in case the training data does not have the same classes
             label_encoder = LabelEncoder()
             X_clf, y_clf = df[clf_features], df[clf_target]
             y_clf_encoded = label_encoder.fit_transform(y_clf)
 
             try:
                 y_pred_orig_encoded = clf_pipeline_orig.predict(X_clf)
+
+                # Use the original label encoder to decode predictions from the original model.
                 y_pred_orig = label_encoder_original.inverse_transform(
                     y_pred_orig_encoded
                 )
+
                 metrics_clf_orig = {"Accuracy": accuracy_score(y_clf, y_pred_orig)}
             except Exception as e:
                 st.warning(f"⚠️ Could not evaluate original classification model: {e}")
@@ -180,6 +185,8 @@ if st.button("🚀 Retrain models"):
             save_model(clf_pipeline_retrained, retrain_clf_path)
 
             y_pred_new_encoded = clf_pipeline_retrained.predict(X_clf)
+
+            # Use the new label encoder to decode predictions from the retrained model.
             y_pred_new = label_encoder.inverse_transform(y_pred_new_encoded)
             metrics_clf_new = {"Accuracy": accuracy_score(y_clf, y_pred_new)}
 

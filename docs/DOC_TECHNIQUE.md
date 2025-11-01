@@ -3,6 +3,8 @@
 ## Application Architecture 
 The __M2_ENEDIS__ application follows a modular, __Python-based architecture__ that separates the frontend interface, backend, machine learning models, and data processing scripts. This structure makes the system easy to maintain, scale, and extend. The entire stack runs in __Docker__ containers, ensuring consistent deployment and environment reproducibility across different systems.
 
+![architecture](https://github.com/user-attachments/assets/62239f77-1c6e-4a45-94ad-25d5c8df27eb)
+
 The system is composed of several main components:
 ### 1. Frontend (Streamlit)
 The __Streamlit interface__ serves as the main entry point for users, providing an interactive and intuitive environment for exploring data and interacting with models. It integrates data visualization, analysis, model training, and prediction functionalities within a single platform. The interface __hosts multiple pages__, including Home, Context, Data, Datasets, Map, Retrain Models, and Prediction, and manages user inputs by sending requests to the backend for data retrieval or model predictions.
@@ -29,7 +31,7 @@ Local or API-based data sources used throughout the application, including: Clim
 The runtime environment includes __Python 3.13__ and the __UV__ package manager. Dependencies, libraries, and configurations are managed consistently through Docker to ensure reproducibility.
 
 
-## Technologies Used 
+## Technologies used 
 The application uses the following technologies:
 
 | Technology | Description  |

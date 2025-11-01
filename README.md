@@ -91,6 +91,18 @@ m2_enedis/
 ```bash
 MAPBOX_API_KEY="your_api_key"
 ```
+
+3. Run the web app:
+
+```bash
+streamlit run home.py
+```
+
+4. (Optional) Run the FastAPI backend in a separate terminal:
+
+```bash
+uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
 ---
 
 ## 📊 Features

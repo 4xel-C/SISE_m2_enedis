@@ -77,6 +77,21 @@ uv sync
 pip install -r requirements.txt
 ```
 
+**Before running** :
+
+1. Rename the example file below
+   
+```
+m2_enedis/
+  └── .streamlit/
+       └── secrets_example.toml -> rename it "secrets.toml"
+```
+
+2. Then replace the content by your api key
+```bash
+MAPBOX_API_KEY="your_api_key"
+```
+
 ---
 
 ## 🚀 Usage

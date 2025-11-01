@@ -94,11 +94,27 @@ MAPBOX_API_KEY="your_api_key"
 
 3. Run the web app:
 
+- **Using UV package manager**
+
+```bash
+uv run streamlit run home.py  
+```
+
+- **Without UV**
+
 ```bash
 streamlit run home.py
 ```
 
 4. (Optional) Run the FastAPI backend in a separate terminal:
+
+- **Using UV package manager**
+
+```bash
+uv run uvicorn backend.main:app --host 0.0.0.0 --port 8000
+```
+
+- **Without UV**
 
 ```bash
 uvicorn backend.main:app --host 0.0.0.0 --port 8000

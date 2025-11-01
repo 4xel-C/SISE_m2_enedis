@@ -53,6 +53,7 @@ docker-compose up -d
 
    - 🌐 Streamlit UI: http://localhost:8501
    - 🔌 FastAPI Backend: http://localhost:8000
+   - 📃 FastAPI Backend documentation: http://localhost:8000/docs
 
 4. Stop the application:
 

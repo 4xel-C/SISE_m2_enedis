@@ -37,11 +37,16 @@ The Statistics & Visualization page provides an interactive overview of the DPE 
     * __Consumption by usage type__: Break down total energy consumption, costs, and GES emissions by each energy usage category (heating, cooling, ECS, lighting, and auxiliaries).
     * __Variable impact analysis__: Explore correlations and relationships between energy consumption and other numeric variables.
 
+
+<img width="1907" height="888" alt="statistics" src="https://github.com/user-attachments/assets/5d1289d5-f910-4b1e-8633-172b09724a04" />
+
 ### 🗺️DPE Map Page  
 The Map Page provides a geographical visualization of the DPE dataset, allowing exploration of the spatial distribution of energy performance across buildings. Users can interactively filter and analyze homes by DPE class and location. Key functionalities include:
 * __Interactive map__: Explore the spatial distribution of homes, with DPE classes visually distinguished by color for quick interpretation.
 * __Dynamic filtering__: Select DPE classes and adjust the number of homes displayed to focus on specific areas or subsets of data.
 * __Tooltips__: Hover over each point to see detailed information, including DPE label, total energy cost, and geographical coordinates.
+  
+<img width="1920" height="850" alt="Map" src="https://github.com/user-attachments/assets/3c91618b-fbd8-4fd8-9ecc-369fdf01caca" />
 
 ### 📂Datasets and Download 
 The Datasets & Download page allows managing local datasets and retrieving new data directly from the ADEME API. It offers tools to upload, refresh, clean, and download datasets used throughout the application. The page is divided into two main sections:
@@ -54,7 +59,14 @@ This page allows users to predict both the energy consumption and the DPE class 
 * __Input Form__: Enter building information such as living area, type, energy source, and city. If the energy consumption value is unknown, the model predicts both energy use and DPE class. If provided, only the DPE class is predicted.
 * __Model selection__: Choose between the original and retrained versions of the regression and classification models directly from the sidebar.
 * __Automatic enrichment__: The app automatically retrieves the climate zone, latitude, longitude, and altitude based on the entered city.
-* __Prediction results__: Display the predicted DPE class and, when applicable, the estimated annual energy cost. 
+* __Prediction results__: Display the predicted DPE class and, when applicable, the estimated annual energy cost.
+
+<table>
+<tr>
+  <td><img src="https://github.com/user-attachments/assets/19af13ea-ccb5-4543-99c2-4912a87f2f43" alt="Predic1"></td>
+  <td><img src="https://github.com/user-attachments/assets/640a3895-53b5-4c57-b4c8-622e8c6774fb" alt="Predic2"></td>
+</tr>
+</table>
 
 ### 🔄Model Retraining 
 This page allows users to retrain the regression and classification models using a new dataset, ensuring that the models remain up to date and adapted to recent data.

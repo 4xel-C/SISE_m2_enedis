@@ -16,7 +16,9 @@ The application is organized into __three main sections__, each containing dedic
     * [🔮Predict DPE Class Page](#predict-dpe-class)
     * [🔄Model Retraining Page](#model-retraining)
 
-## Project Section 
+<br/>
+
+## 1. Project Section 
 ### 🏠Home Page 
 The home page introduces the application and its main objectives. It outlines the key features—data exploration, visualization, and DPE/energy consumption prediction- and guides users to the different sections.
 ### 📋Context Page
@@ -26,8 +28,10 @@ The Context Page gives an overview of all available data sources and their struc
 * __Prediction variables__ - detailed information on the quantitative and qualitative features used by the ML models.
 * __Data processing workflow__ - how data is collected, enriched, cleaned, and prepared
 * __Data quality indicators__ - highlights dataset strengths, limitations, and considerations for interpreting results
+  
+<br/>
 
-## Data Section
+## 2. Data Section
 ### 📊Statistics & Visualization Page
 The Statistics & Visualization page lets users explore and analyze the DPE dataset through interactive filters and visualizations. It contains __two subpages__:
 * __🧮Datasets Print__: Browse the dataset, view the first rows, and check the total number of records. Users can sort data in ascending or descending order and export samples as CSV files.
@@ -58,7 +62,9 @@ The Datasets & Download page manages local datasets and allows the retrieval of 
 * __🧮 Your Datasets__: Browse, load, and preview locally stored datasets. Existing datasets can be refreshed with new data from the ADEME API, downloaded, or deleted.
 * __🛜 Fetch new data__: Import new data by department and building type (existing or new) directly from the ADEME API. The acquired data is automatically cleaned, formatted, and ready to be added to the existing datasets.
 
-## Prediction Section 
+<br/>
+
+## 3. Prediction Section 
 ### 🔮Predict DPE Class
 This page allows users to predict the energy consumption and the DPE class of a building based on its characteristics. It includes: 
 * __Input Form__: Enter building details like living area, type, energy source, and city. If energy consumption is unknown, the model predicts both consumption and DPE class. If provided, only the DPE class is predicted.

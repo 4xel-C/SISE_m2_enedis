@@ -6,9 +6,9 @@
 
 ## 🚀 Try our services
 
-- 🌐 Streamlit UI: m2-enedis.cyrizon.fr
-- 🔌 FastAPI Backend: m2-enedis-api.cyrizon.fr
-- 📃 FastAPI Backend documentation: m2-enedis-api.cyrizon.fr/docs
+- 🌐 Streamlit UI: https://m2-enedis.cyrizon.fr
+- 🔌 FastAPI Backend: https://m2-enedis-api.cyrizon.fr
+- 📃 FastAPI Backend documentation: https://m2-enedis-api.cyrizon.fr/docs
 
 ## 🧠 Introduction
 

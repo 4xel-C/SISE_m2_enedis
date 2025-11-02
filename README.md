@@ -216,7 +216,7 @@ See the [LICENSE](LICENSE) file for more information.
 
 ---
 
-<img width="2181" height="1126" alt="image" src="https://github.com/user-attachments/assets/43cc255b-d267-498b-854c-35477353ea1c" />
+<img width="2181" height="1126" alt="image" src="https://github.com/user-attachments/assets/bda7bc1f-3f08-4ec5-bd40-0a96d7bcb115" />
 
 <img width="2120" height="850" alt="image" src="https://github.com/user-attachments/assets/f91c6bac-559b-427a-a844-3f6baf92a687" />
 

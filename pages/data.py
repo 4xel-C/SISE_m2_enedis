@@ -105,6 +105,9 @@ if data is not None:
         # Most frequent DPE class
         most_common_dpe = filtered_df["etiquette_dpe"].mode()[0]
         icon = f"Small-DPE-{most_common_dpe.upper()}.png"
+        # Detect active theme
+        theme = st.get_option("theme.base")
+        text_color = "rgba(250, 250, 250, 0.6)" if theme == "dark" else "rgba(30, 30, 30, 0.6)"
         with col4.container(border=True):
             st.markdown(
                 """
@@ -112,7 +115,7 @@ if data is not None:
                 .metric-label {
                     font-size: 0.875rem;        /* same label as metrics */
                     font-weight: 500;
-                    color: rgba(250, 250, 250, 0.9);
+                    color: {text_color};
                     text-align: left;
                     margin-bottom: 0.25rem;
                 }

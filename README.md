@@ -4,6 +4,12 @@
 ![Streamlit version](https://img.shields.io/badge/Streamlit-1.50-orange?logo=streamlit&logoColor=white)
 ![Scikit-learn version](https://img.shields.io/badge/scikit--learn-1.7.2-orange?logo=scikit-learn&logoColor=white)
 
+## 🚀 Try our services
+
+- 🌐 Streamlit UI: m2-enedis.cyrizon.fr
+- 🔌 FastAPI Backend: m2-enedis-api.cyrizon.fr
+- 📃 FastAPI Backend documentation: m2-enedis-api.cyrizon.fr/docs
+
 ## 🧠 Introduction
 
 This repository hosts a complete **web application** that provides an interface for **data analysis**, **dataset management**, and **prediction** using **pretrained machine learning models**. The application predicts:

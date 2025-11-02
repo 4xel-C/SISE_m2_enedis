@@ -134,7 +134,7 @@ La méthodologie suivante à été appliquée, en utilisant le même set d'entra
 
 ### Comparaison des algorithmes
 
-Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons tenté d'évaluer la performance des modèles et de les comparer. Nous donc répéter **30** fois la procédure suivante, pour chacun des algorithmes :
+Une fois les hyperparamètres trouvés pour chacun des algorithmes, nous avons tenté d'évaluer la performance des modèles et de les comparer. Nous avons donc répété **30** fois la procédure suivante, pour chacun des algorithmes :
 
 - Re-générer le split Train/Test.
 - Entraîner le modèle et effectuer l'évaluation sur les données d'entraînement. (**balanced_accuracy, accuracy, f1_score, hamming_loss**)

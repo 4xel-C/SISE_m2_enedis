@@ -19,13 +19,14 @@ Ce rapport a pour but de décrire les étapes et les études réalisées à l'é
 **Ergonomie d'utilisation:**
 
 - L'utilisateur doit utiliser les modèles pour pouvoir prédire la **classe DPE** de son appartement et/ou **sa consommation**. Ainsi, l'utilisateur doit pouvoir utiliser sa consommation réelle si elle est connue afin d'améliorer la prédiction de sa classe.
-- L'utilisateur de notre application ne pourra fournir qu'une quantité limitée de données pour la prédiction de sa classe. Ainsi les données trop techniques, ou difficilement obtenable seront évitées afin de fournir un formulaire de prédiction cohérent.
+- L'utilisateur de notre application ne pourra fournir qu'une quantité limitée de données pour la prédiction de sa classe. Ainsi les données trop techniques, ou difficilement obtenables seront évitées afin de fournir un formulaire de prédiction cohérent.
 
 **Prédictions:**
 
 - Nous souhaitons élaborer un modèle capable de prédire chacune des **7 classes DPE**.
 - Concernant la régression, nous prédirons le **coût total 5 usages**.
-  > [!Remarque]
+
+  > **Remarque:**
   > Le coût total 5 usages fait partie de l'enjeu de prédiction de la régression et fait partie des données utiles à l'estimation de la classe DPE. Un utilisateur possédant sa consommation pourra directement s'en servir pour prédire sa classe DPE. Dans le cas où l'utilisateur ne la possèderait pas, le **modèle de regression prédira la consommation théorique**, et cet élément sera ensuite utilisé pour **une double prédiction pour prédire la classe DPE**.
 
 **Scope:**
@@ -61,7 +62,7 @@ Permettant de faire intervenir les différences de climat dans la prédiction.
 
 ### Extraction des données
 
-La majorité de la donnée a été récupérée de l'API de **l'ademe**. Afin d'établir un data set représentatif de la totalité de la France, nous avons extrait tout d'abord extrait la _liste de tous les départements et le nombre d'éléments_ en utilisant les routes d'API d'agrégation. Cette liste de département nous a ensuite permis d'extraire 10.000 lignes de chaque département, à la fois sur les _logements existants_ et sur _les logements neufs_. Ainsi, environ 1 millions de lignes ont pu être récupérées sur l'ensemble du territoire, comptabilisant plus de 2 heures de téléchargement.
+La majorité de la donnée a été récupérée de l'API de **l'ademe**. Afin d'établir un data set représentatif de la totalité de la France, nous avons extrait tout d'abord extrait la liste de tous les départements et le nombre d'éléments en utilisant les routes d'API d'agrégation. Cette liste de département nous a ensuite permis d'extraire 10.000 lignes de chaque département, à la fois sur les _logements existants_ et sur _les logements neufs_. Ainsi, environ 1 millions de lignes ont pu être récupérées sur l'ensemble du territoire, comptabilisant plus de 2 heures de téléchargement.
 
 ### Sélection des variables
 

@@ -44,8 +44,9 @@ The Statistics & Visualization page lets users explore and analyze the DPE datas
     * __Variable impact analysis__: Explore correlations and relationships between energy consumption and other numeric variables.
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/5d1289d5-f910-4b1e-8633-172b09724a04" alt="statistics" width="900">
+  <img src="https://github.com/user-attachments/assets/0a15e731-db94-406a-9147-0b93a3b18032" alt="statistics" width="900">
 </p>
+<br/>
 
 ### 🗺️DPE Map Page  
 The Map Page visualizes the geographic distribution of DPE classes across buildings. Users can interactively filter and analyze homes by DPE class and location:
@@ -56,6 +57,7 @@ The Map Page visualizes the geographic distribution of DPE classes across buildi
 <p align="center"> 
    <img width="900" height="850" alt="Map" src="https://github.com/user-attachments/assets/bcf1b0b2-99ce-4722-adf4-bab4320baca4" />
 </p>
+<br/>
 
 ### 📂Datasets and Download 
 The Datasets & Download page manages local datasets and allows the retrieval of new data directly from the ADEME API. Users can upload, refresh, clean, and download datasets. The page has two main sections:
@@ -78,6 +80,7 @@ This page allows users to predict the energy consumption and the DPE class of a 
   <td><img src="https://github.com/user-attachments/assets/5d549aac-b245-4d5a-832c-c746fadbc9d6" alt="Predic2"></td>
 </tr>
 </table>
+<br/> 
 
 ### 🔄Model Retraining 
 This page allows users to retrain the regression and classification models using a new dataset, ensuring that the models remain up to date and adapted to recent data.

@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import os
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -7,6 +8,8 @@ import streamlit as st
 from streamlit_dynamic_filters import DynamicFilters
 
 from src.utils.dataloader import generate_file_selector
+
+ASSETS = "assets"
 
 # Plotly configuration
 config = {"width": "stretch"}
@@ -101,11 +104,25 @@ if data is not None:
         )
         # Most frequent DPE class
         most_common_dpe = filtered_df["etiquette_dpe"].mode()[0]
-        col4.metric(
-            label="Most frequent DPE label (replace with icon)",
-            value=most_common_dpe,
-            border=True,
-        )
+        icon = f"Small-DPE-{most_common_dpe.upper()}.png"
+        with col4.container(border=True):
+            st.markdown(
+                """
+                <style>
+                .metric-label {
+                    font-size: 0.875rem;        /* same label as metrics */
+                    font-weight: 500;
+                    color: rgba(250, 250, 250, 0.9);
+                    text-align: left;
+                    margin-bottom: 0.25rem;
+                }
+                </style>
+                <div class="metric-label">Most frequent DPE label</div>
+                """,
+                unsafe_allow_html=True
+            )
+            st.image(os.path.join(ASSETS, icon), width=190)
+
 
         # ------------------------------------------------------------------------------------------
         # General Info

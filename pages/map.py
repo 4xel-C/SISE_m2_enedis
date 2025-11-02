@@ -29,22 +29,22 @@ DEFAULT_POINTS_MAP = 50_000
 DEFAULT_ROWS_DISPLAY = 10_000
 NB_BINS = 50
 
-# === Filtres latéraux ===
+# === Sidebar Filters ===
 
 if data is not None:
     col_map, col_filters = st.columns([0.75, 0.25])
 
     with col_filters:
-        st.markdown("### 🔎 Filtres")
+        st.markdown("### 🔎 Filters")
 
-        # Choix des classes DPE
+        # Choice of DPE classes
         dpe_classes = ["A", "B", "C", "D", "E", "F", "G"]
         selected_dpe = []
         for c in dpe_classes:
             if st.checkbox(f"Class {c}", value=True, key=f"dpe_{c}"):
                 selected_dpe.append(c)
 
-        # Filtrage
+        # Filtering
         data_filtered = data[data["etiquette_dpe"].isin(selected_dpe)]
 
         # Slider to choose the number of points on the map

@@ -21,14 +21,15 @@ RUN uv sync --frozen
 # Copy application code
 COPY . .
 
-# Expose Streamlit port only
+# Expose Streamlit and FastAPI ports
 EXPOSE 8501
+EXPOSE 8000
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 ENV STREAMLIT_SERVER_PORT=8501
 ENV STREAMLIT_SERVER_ADDRESS=0.0.0.0
-ENV FASTAPI_HOST=127.0.0.1
+ENV FASTAPI_HOST=0.0.0.0
 ENV FASTAPI_PORT=8000
 
 # Create startup script that launches BOTH FastAPI and Streamlit
@@ -41,9 +42,9 @@ RUN echo '#!/bin/bash\n\
     echo "MAPBOX_API_KEY = \"${MAPBOX_API_KEY}\"" > .streamlit/secrets.toml\n\
     fi\n\
     \n\
-    # Start FastAPI backend in background (internal only)\n\
+    # Start FastAPI backend in background (exposed publicly)\n\
     echo "Starting FastAPI backend..."\n\
-    uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000 &\n\
+    uv run uvicorn backend.main:app --host 0.0.0.0 --port 8000 &\n\
     FASTAPI_PID=$!\n\
     \n\
     # Wait for FastAPI to be ready\n\
